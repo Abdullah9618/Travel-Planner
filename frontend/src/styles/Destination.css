@@ -1,0 +1,381 @@
+/* Destination Page Styles */
+.destination-page {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+}
+
+.destination-page.loading,
+.destination-page.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+/* Hero Section */
+.destination-hero {
+  position: relative;
+  height: 60vh;
+  min-height: 400px;
+  max-height: 600px;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.destination-hero .hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+}
+
+.destination-hero .hero-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+  color: white;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  opacity: 0.9;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.back-link:hover {
+  opacity: 1;
+}
+
+.hero-info {
+  margin: auto 0;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  background: var(--primary-color);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.destination-hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.hero-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.action-btn.save {
+  background: white;
+  color: var(--danger-color);
+}
+
+.action-btn.save:hover {
+  background: var(--danger-color);
+  color: white;
+}
+
+.action-btn.share {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.action-btn.share:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Main Content */
+.destination-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  margin-top: -4rem;
+  position: relative;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+}
+
+.details-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.content-section {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.content-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.description {
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.fact-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.25rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  gap: 0.5rem;
+}
+
+.fact-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.fact-label {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.fact-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.activities-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.activity-badge {
+  padding: 0.5rem 1rem;
+  background: var(--primary-light);
+  color: var(--primary-color);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Budget Column */
+.budget-column {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.budget-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.budget-card h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.days-selector {
+  margin-bottom: 1.5rem;
+}
+
+.days-selector label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.days-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.days-btn {
+  flex: 1;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.days-btn:hover {
+  border-color: var(--primary-color);
+}
+
+.days-btn.active {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.starting-price {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: 1.5rem;
+}
+
+.starting-price span:first-child {
+  color: var(--text-secondary);
+}
+
+.starting-price .price {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.book-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  transition: var(--transition);
+}
+
+.book-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+.login-notice {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.login-notice a {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Similar Destinations */
+.similar-section {
+  margin-top: 3rem;
+}
+
+.similar-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.similar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .budget-column {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .destination-hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero-meta {
+    gap: 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .destination-content {
+    padding: 1rem;
+    margin-top: -2rem;
+  }
+
+  .facts-grid {
+    grid-template-columns: 1fr;
+  }
+}

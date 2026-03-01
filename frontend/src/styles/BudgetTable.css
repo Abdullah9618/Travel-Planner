@@ -1,0 +1,142 @@
+/* Budget Table Styles */
+.budget-table-container {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.budget-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.budget-icon {
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+.budget-header h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.budget-header p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.budget-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.budget-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.item-icon {
+  font-size: 1.2rem;
+}
+
+.item-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.item-cost {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cost-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cost-percentage {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.budget-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--primary-color);
+}
+
+.total-label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.total-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.budget-tips {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--primary-light);
+  border-radius: var(--radius-md);
+}
+
+.budget-tips h4 {
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  color: var(--primary-dark);
+}
+
+.budget-tips ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.budget-tips li {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.budget-tips li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--secondary-color);
+}

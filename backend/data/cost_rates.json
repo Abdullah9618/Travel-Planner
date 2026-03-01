@@ -1,0 +1,44 @@
+{
+  "Gilgit Baltistan": {
+    "hotel_per_day": 4000,
+    "travel": 8000,
+    "meals_per_day": 1500,
+    "activities": 3000
+  },
+  "KPK": {
+    "hotel_per_day": 3500,
+    "travel": 6000,
+    "meals_per_day": 1200,
+    "activities": 2500
+  },
+  "Punjab": {
+    "hotel_per_day": 3000,
+    "travel": 4000,
+    "meals_per_day": 1000,
+    "activities": 2000
+  },
+  "Sindh": {
+    "hotel_per_day": 3500,
+    "travel": 5000,
+    "meals_per_day": 1200,
+    "activities": 2500
+  },
+  "Balochistan": {
+    "hotel_per_day": 3000,
+    "travel": 7000,
+    "meals_per_day": 1000,
+    "activities": 2000
+  },
+  "AJK": {
+    "hotel_per_day": 3500,
+    "travel": 5500,
+    "meals_per_day": 1200,
+    "activities": 2500
+  },
+  "default": {
+    "hotel_per_day": 3000,
+    "travel": 5000,
+    "meals_per_day": 1500,
+    "activities": 2000
+  }
+}

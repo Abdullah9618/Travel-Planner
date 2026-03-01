@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "email": "admin@travelplanner.com",
+    "name": "Admin",
+    "password": "scrypt:32768:8:1$PlainTextForDemo$admin123",
+    "preferences": {},
+    "saved_trips": [],
+    "history": [],
+    "role": "admin"
+  }
+]
