@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaSignInAlt, FaPlane } from 'react-icons/fa';
+import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
@@ -13,7 +14,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -132,6 +133,27 @@ const Login = () => {
             <div className="auth-divider">
               <span>or continue as</span>
             </div>
+
+            {process.env.REACT_APP_GOOGLE_CLIENT_ID && (
+              <div style={{ marginBottom: '1rem' }}>
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                    if (!credentialResponse?.credential) {
+                      toast.error('Google credential was not received');
+                      return;
+                    }
+                    const result = await loginWithGoogle(credentialResponse.credential);
+                    if (result.success) {
+                      toast.success('Logged in with Google successfully!');
+                      navigate(from, { replace: true });
+                    } else {
+                      toast.error(result.error);
+                    }
+                  }}
+                  onError={() => toast.error('Google sign-in failed')}
+                />
+              </div>
+            )}
 
             <Link to="/" className="guest-btn">
               Browse as Guest

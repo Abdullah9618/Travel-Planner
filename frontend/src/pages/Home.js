@@ -10,6 +10,7 @@ import '../styles/Home.css';
 const Home = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [travelSuggestions, setTravelSuggestions] = useState([]);
+  const [homeInsights, setHomeInsights] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user, isAuthenticated } = useAuth();
 
@@ -33,6 +34,9 @@ const Home = () => {
         // Fetch travel suggestions
         const suggestionsResponse = await destinationService.getTravelSuggestions();
         setTravelSuggestions(suggestionsResponse.data);
+
+        const insightsResponse = await destinationService.getHomeInsights();
+        setHomeInsights(insightsResponse.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -56,9 +60,12 @@ const Home = () => {
       <section className="hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <h1>Discover the Beauty of Pakistan</h1>
+          <h1>{isAuthenticated ? `Welcome back, ${user?.name || 'Traveler'}!` : 'Discover the Beauty of Pakistan'}</h1>
           <p>Plan your perfect trip with AI-powered recommendations</p>
           <SearchBar />
+          <div className="cta-buttons" style={{ marginTop: '1.2rem' }}>
+            <Link to="/planner" className="btn btn-primary">Plan My Trip</Link>
+          </div>
           
           {!isAuthenticated && (
             <p className="guest-notice">
@@ -80,6 +87,29 @@ const Home = () => {
           ))}
         </div>
       </section>
+
+      {homeInsights && (
+        <section className="section suggestion-section">
+          <div className="section-header">
+            <h2>Live Weather & Travel Advisories</h2>
+          </div>
+          <div className="destinations-row">
+            {homeInsights.weather_highlights?.map((item, idx) => (
+              <div key={idx} className="saved-trip-card">
+                <h3>{item.destination}</h3>
+                <p>{item.region}</p>
+                <p><strong>{item.temperature}°C</strong> • {item.condition}</p>
+                <span className="saved-date">{item.description}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: '1rem' }}>
+            {homeInsights.travel_advisories?.map((advisory, idx) => (
+              <p key={idx} style={{ marginBottom: '0.4rem' }}>• <strong>{advisory.title}:</strong> {advisory.message}</p>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Recommendations Section */}
       <section className="section recommendations-section">

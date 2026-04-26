@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FaUser, FaSave, FaHeart, FaCog, FaHistory, FaEdit } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
-import DestinationCard from '../components/DestinationCard';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -293,11 +292,28 @@ const Profile = () => {
           {activeTab === 'history' && (
             <div className="history-section">
               <h2>Travel History</h2>
-              <div className="empty-state">
-                <FaHistory className="empty-icon" />
-                <h3>No travel history</h3>
-                <p>Your completed trips will appear here</p>
-              </div>
+              {user?.history?.length > 0 ? (
+                <div className="saved-trips-grid">
+                  {user.history.map((item, index) => (
+                    <div key={index} className="saved-trip-card">
+                      <h3>{item.destination}</h3>
+                      <p>{item.days} days trip</p>
+                      <p className="trip-cost">
+                        {formatCurrency(item.budget_estimate?.total || 0)}
+                      </p>
+                      <span className="saved-date">
+                        {item.action || 'saved'} on {new Date(item.saved_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state">
+                  <FaHistory className="empty-icon" />
+                  <h3>No travel history</h3>
+                  <p>Your completed trips will appear here</p>
+                </div>
+              )}
             </div>
           )}
         </div>

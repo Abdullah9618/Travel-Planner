@@ -65,6 +65,8 @@ A comprehensive web application for planning trips in Pakistan with AI-powered d
 - **Flask-CORS** - Cross-origin support
 - **Flask-JWT-Extended** - JWT authentication
 - **Werkzeug** - Password hashing
+- **SQLAlchemy** - Database-backed persistence layer (MySQL/SQLite)
+- **Google Auth** - Google OAuth token verification
 
 ### AI/ML
 - **NumPy** - Numerical computing
@@ -75,10 +77,8 @@ A comprehensive web application for planning trips in Pakistan with AI-powered d
   - Similarity calculations
 
 ### Database
-- **JSON Files** - Data storage (prototype)
-  - destinations.json
-  - users.json
-  - cost_rates.json
+- **MySQL / SQLite via SQLAlchemy** - Production-ready persistence
+- JSON files remain as seed/backup data sources
 
 ## 📁 Project Structure
 
@@ -215,6 +215,10 @@ The frontend will run on `http://localhost:3000`
 | GET | `/api/destinations/:id` | Get single destination |
 | GET/POST | `/api/recommendations` | Get recommendations |
 | GET | `/api/travel-suggestions` | Get travel suggestions |
+| GET | `/api/home/insights` | Weather highlights + advisories |
+| GET | `/api/weather/highlights` | Live regional weather snapshots |
+| GET | `/api/explore/places` | TravelAdvisor places search |
+| POST | `/api/itinerary/generate` | Generate AI itinerary |
 | POST | `/api/budget/estimate` | Estimate trip budget |
 
 ### Auth Endpoints
@@ -222,9 +226,38 @@ The frontend will run on `http://localhost:3000`
 |--------|----------|-------------|
 | POST | `/api/auth/register` | Register new user |
 | POST | `/api/auth/login` | Login user |
+| POST | `/api/auth/google` | Login/register with Google ID token |
 | GET | `/api/auth/profile` | Get user profile |
 | PUT | `/api/auth/profile` | Update profile |
 | POST | `/api/auth/save-trip` | Save trip to profile |
+
+## 🔑 Environment Variables
+
+### Backend (`backend/.env`)
+- `JWT_SECRET_KEY`
+- `DATABASE_URL` (optional, e.g. `mysql+pymysql://user:pass@host:3306/dbname`)
+- `OPENWEATHER_API_KEY`
+- `MAPTILER_API_KEY`
+- `TRAVELADVISOR_API_KEY`
+- `GOOGLE_CLIENT_ID` (for Google OAuth)
+
+### Frontend (`frontend/.env`)
+- `REACT_APP_API_URL`
+- `REACT_APP_GOOGLE_CLIENT_ID`
+- `REACT_APP_MAPTILER_API_KEY`
+
+## 🐳 Docker Deployment (Full Stack)
+
+Run from project root:
+
+```bash
+docker compose up --build
+```
+
+Services:
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:5000`
+- MySQL: `localhost:3306`
 
 ### Admin Endpoints (Protected)
 | Method | Endpoint | Description |

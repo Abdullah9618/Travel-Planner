@@ -22,9 +22,17 @@ export const AuthProvider = ({ children }) => {
       const savedUser = localStorage.getItem('user');
       
       if (savedToken && savedUser) {
-        setToken(savedToken);
-        setUser(JSON.parse(savedUser));
         api.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+
+        try {
+          const response = await api.get('/auth/profile');
+          setToken(savedToken);
+          setUser(response.data);
+          localStorage.setItem('user', JSON.stringify(response.data));
+        } catch (error) {
+          setToken(savedToken);
+          setUser(JSON.parse(savedUser));
+        }
       }
       setLoading(false);
     };
@@ -74,6 +82,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async (idToken) => {
+    try {
+      const response = await api.post('/auth/google', { id_token: idToken });
+      const { token: newToken, user: userData } = response.data;
+
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+
+      setToken(newToken);
+      setUser(userData);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Google login failed'
+      };
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -101,7 +130,11 @@ export const AuthProvider = ({ children }) => {
 
   const saveTrip = async (tripData) => {
     try {
-      await api.post('/auth/save-trip', tripData);
+      const response = await api.post('/auth/save-trip', tripData);
+      if (response.data?.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        setUser(response.data.user);
+      }
       return { success: true };
     } catch (error) {
       return { 
@@ -118,6 +151,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!token,
     isAdmin: user?.role === 'admin',
     login,
+    loginWithGoogle,
     register,
     logout,
     updateProfile,

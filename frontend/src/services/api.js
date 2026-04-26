@@ -41,7 +41,12 @@ export const destinationService = {
   search: (query) => api.post('/search', { query }),
   getRecommendations: (preferences, history) => 
     api.post('/recommendations', { preferences, history }),
-  getTravelSuggestions: () => api.get('/travel-suggestions')
+  getTravelSuggestions: () => api.get('/travel-suggestions'),
+  getHomeInsights: () => api.get('/home/insights'),
+  getWeatherHighlights: (region) => api.get('/weather/highlights', { params: region ? { region } : {} }),
+  getPlaces: (query, category = 'attractions') =>
+    api.get('/explore/places', { params: { query, category, limit: 5 } }),
+  generateItinerary: (payload) => api.post('/itinerary/generate', payload)
 };
 
 // Budget API calls

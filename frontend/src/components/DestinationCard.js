@@ -16,7 +16,6 @@ const DestinationCard = ({
     type,
     region,
     cost,
-    weather,
     best_season,
     activities,
     safety_rating,
@@ -28,10 +27,23 @@ const DestinationCard = ({
     match_reason
   } = destination;
 
-  // Generate placeholder image URL based on name
+  // Generate placeholder image URL based on destination id - optimized for fast loading
+  const placeholderImages = {
+    'Hunza Valley': 'https://picsum.photos/seed/hunza/400/300',
+    'Gwadar Beach': 'https://picsum.photos/seed/beach/400/300',
+    'Murree': 'https://picsum.photos/seed/hills/400/300',
+    'Skardu': 'https://picsum.photos/seed/mountains/400/300',
+    'Swat Valley': 'https://picsum.photos/seed/valley/400/300',
+    'Naran Kaghan': 'https://picsum.photos/seed/lake/400/300',
+    'Lahore': 'https://picsum.photos/seed/city/400/300',
+    'Islamabad': 'https://picsum.photos/seed/capital/400/300',
+    'Karachi': 'https://picsum.photos/seed/karachi/400/300',
+    'Fairy Meadows': 'https://picsum.photos/seed/meadows/400/300',
+  };
+  
   const imageUrl = image?.startsWith('http') 
     ? image 
-    : `https://source.unsplash.com/400x300/?${encodeURIComponent(name + ' pakistan landscape')}`;
+    : (placeholderImages[name] || `https://picsum.photos/seed/${encodeURIComponent(name)}/400/300`);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-PK', {

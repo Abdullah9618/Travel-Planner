@@ -3,7 +3,6 @@ ML-Based Recommendation Engine
 Implements Content-Based Filtering and Collaborative Filtering
 """
 
-import numpy as np
 from typing import List, Dict, Optional
 from collections import defaultdict
 

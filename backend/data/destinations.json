@@ -7,7 +7,12 @@
     "cost": 25000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Hiking", "Sightseeing", "Photography", "Rock Climbing"],
+    "activities": [
+      "Hiking",
+      "Sightseeing",
+      "Photography",
+      "Rock Climbing"
+    ],
     "safety_rating": 5,
     "user_rating": 4.8,
     "image": "hunza.jpg",
@@ -21,7 +26,12 @@
     "cost": 18000,
     "weather": "Warm",
     "best_season": "Winter",
-    "activities": ["Swimming", "Sunbathing", "Boat Ride", "Fishing"],
+    "activities": [
+      "Swimming",
+      "Sunbathing",
+      "Boat Ride",
+      "Fishing"
+    ],
     "safety_rating": 4,
     "user_rating": 4.5,
     "image": "gwadar.jpg",
@@ -35,7 +45,12 @@
     "cost": 15000,
     "weather": "Cold",
     "best_season": "All Year",
-    "activities": ["Shopping", "Cable Car", "Hiking", "Snow Activities"],
+    "activities": [
+      "Shopping",
+      "Cable Car",
+      "Hiking",
+      "Snow Activities"
+    ],
     "safety_rating": 4,
     "user_rating": 4.3,
     "image": "murree.jpg",
@@ -49,7 +64,13 @@
     "cost": 35000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Trekking", "Camping", "Boating", "Photography", "Rock Climbing"],
+    "activities": [
+      "Trekking",
+      "Camping",
+      "Boating",
+      "Photography",
+      "Rock Climbing"
+    ],
     "safety_rating": 5,
     "user_rating": 4.9,
     "image": "skardu.jpg",
@@ -63,7 +84,12 @@
     "cost": 20000,
     "weather": "Moderate",
     "best_season": "Spring",
-    "activities": ["Sightseeing", "Hiking", "Skiing", "Cultural Tours"],
+    "activities": [
+      "Sightseeing",
+      "Hiking",
+      "Skiing",
+      "Cultural Tours"
+    ],
     "safety_rating": 4,
     "user_rating": 4.6,
     "image": "swat.jpg",
@@ -77,7 +103,12 @@
     "cost": 22000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Hiking", "Boating", "Photography", "Camping"],
+    "activities": [
+      "Hiking",
+      "Boating",
+      "Photography",
+      "Camping"
+    ],
     "safety_rating": 4,
     "user_rating": 4.7,
     "image": "naran.jpg",
@@ -91,7 +122,12 @@
     "cost": 12000,
     "weather": "Warm",
     "best_season": "Winter",
-    "activities": ["Food Tours", "Historical Sites", "Shopping", "Museums"],
+    "activities": [
+      "Food Tours",
+      "Historical Sites",
+      "Shopping",
+      "Museums"
+    ],
     "safety_rating": 4,
     "user_rating": 4.5,
     "image": "lahore.jpg",
@@ -105,7 +141,12 @@
     "cost": 28000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Trekking", "Camping", "Photography", "Stargazing"],
+    "activities": [
+      "Trekking",
+      "Camping",
+      "Photography",
+      "Stargazing"
+    ],
     "safety_rating": 4,
     "user_rating": 4.8,
     "image": "fairy_meadows.jpg",
@@ -119,7 +160,12 @@
     "cost": 18000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Sightseeing", "Photography", "Rafting", "Hiking"],
+    "activities": [
+      "Sightseeing",
+      "Photography",
+      "Rafting",
+      "Hiking"
+    ],
     "safety_rating": 4,
     "user_rating": 4.6,
     "image": "neelum.jpg",
@@ -133,7 +179,12 @@
     "cost": 15000,
     "weather": "Hot",
     "best_season": "Winter",
-    "activities": ["Beach Activities", "Food Tours", "Shopping", "Museums"],
+    "activities": [
+      "Beach Activities",
+      "Food Tours",
+      "Shopping",
+      "Museums"
+    ],
     "safety_rating": 3,
     "user_rating": 4.2,
     "image": "karachi.jpg",
@@ -147,7 +198,12 @@
     "cost": 8000,
     "weather": "Moderate",
     "best_season": "All Year",
-    "activities": ["Historical Tours", "Museums", "Photography", "Walking Tours"],
+    "activities": [
+      "Historical Tours",
+      "Museums",
+      "Photography",
+      "Walking Tours"
+    ],
     "safety_rating": 4,
     "user_rating": 4.4,
     "image": "taxila.jpg",
@@ -161,7 +217,12 @@
     "cost": 16000,
     "weather": "Cold",
     "best_season": "Winter",
-    "activities": ["Skiing", "Snowboarding", "Cable Car", "Hiking"],
+    "activities": [
+      "Skiing",
+      "Snowboarding",
+      "Cable Car",
+      "Hiking"
+    ],
     "safety_rating": 4,
     "user_rating": 4.5,
     "image": "malam_jabba.jpg",
@@ -175,7 +236,12 @@
     "cost": 30000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Wildlife Safari", "Photography", "Camping", "Trekking"],
+    "activities": [
+      "Wildlife Safari",
+      "Photography",
+      "Camping",
+      "Trekking"
+    ],
     "safety_rating": 5,
     "user_rating": 4.7,
     "image": "deosai.jpg",
@@ -189,7 +255,12 @@
     "cost": 10000,
     "weather": "Hot",
     "best_season": "Winter",
-    "activities": ["Historical Tours", "Museums", "Photography", "Educational Tours"],
+    "activities": [
+      "Historical Tours",
+      "Museums",
+      "Photography",
+      "Educational Tours"
+    ],
     "safety_rating": 4,
     "user_rating": 4.3,
     "image": "mohenjo_daro.jpg",
@@ -203,7 +274,12 @@
     "cost": 25000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Cultural Tours", "Trekking", "Photography", "Festival Visits"],
+    "activities": [
+      "Cultural Tours",
+      "Trekking",
+      "Photography",
+      "Festival Visits"
+    ],
     "safety_rating": 4,
     "user_rating": 4.6,
     "image": "chitral.jpg",
@@ -217,7 +293,12 @@
     "cost": 26000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Boating", "Jet Skiing", "Photography", "Sightseeing"],
+    "activities": [
+      "Boating",
+      "Jet Skiing",
+      "Photography",
+      "Sightseeing"
+    ],
     "safety_rating": 5,
     "user_rating": 4.7,
     "image": "attabad.jpg",
@@ -231,7 +312,12 @@
     "cost": 14000,
     "weather": "Moderate",
     "best_season": "Spring",
-    "activities": ["Sightseeing", "Hiking", "Photography", "Historical Tours"],
+    "activities": [
+      "Sightseeing",
+      "Hiking",
+      "Photography",
+      "Historical Tours"
+    ],
     "safety_rating": 4,
     "user_rating": 4.2,
     "image": "ziarat.jpg",
@@ -245,7 +331,12 @@
     "cost": 12000,
     "weather": "Cool",
     "best_season": "Summer",
-    "activities": ["Hiking", "Photography", "Bird Watching", "Nature Walks"],
+    "activities": [
+      "Hiking",
+      "Photography",
+      "Bird Watching",
+      "Nature Walks"
+    ],
     "safety_rating": 5,
     "user_rating": 4.4,
     "image": "nathia_gali.jpg",
@@ -259,7 +350,12 @@
     "cost": 32000,
     "weather": "Cold",
     "best_season": "Summer",
-    "activities": ["Photography", "Border Visit", "Wildlife Spotting", "Sightseeing"],
+    "activities": [
+      "Photography",
+      "Border Visit",
+      "Wildlife Spotting",
+      "Sightseeing"
+    ],
     "safety_rating": 4,
     "user_rating": 4.6,
     "image": "khunjerab.jpg",
@@ -273,7 +369,12 @@
     "cost": 10000,
     "weather": "Moderate",
     "best_season": "All Year",
-    "activities": ["Shopping", "Food Tours", "Historical Sites", "Museums"],
+    "activities": [
+      "Shopping",
+      "Food Tours",
+      "Historical Sites",
+      "Museums"
+    ],
     "safety_rating": 4,
     "user_rating": 4.1,
     "image": "rawalpindi.jpg",

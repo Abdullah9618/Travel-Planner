@@ -1,0 +1,169 @@
+.planner-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.planner-header h1 {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.planner-form {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  margin: 1rem 0 1.5rem;
+}
+
+.planner-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-group input {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.65rem;
+}
+
+.planner-btn {
+  margin-top: 0.85rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.planner-results {
+  display: grid;
+  gap: 1rem;
+}
+
+.planner-summary,
+.panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.panel p,
+.panel li,
+.panel h3,
+.panel h4 {
+  overflow-wrap: anywhere;
+}
+
+.planner-panels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.day-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.day-card {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.75rem;
+  background: #fafafa;
+}
+
+.budget-status {
+  font-weight: 600;
+}
+
+.budget-status.within_budget {
+  color: #16a34a;
+}
+
+.budget-status.over_budget {
+  color: #dc2626;
+}
+
+.map-link {
+  display: inline-block;
+  margin-top: 0.65rem;
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.planner-error {
+  color: #dc2626;
+}
+
+.budget-panel .budget-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.budget-panel .budget-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.budget-panel .budget-list li span {
+  color: var(--text-secondary);
+}
+
+.budget-panel .budget-list li strong {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.budget-total-row {
+  margin-top: 0.8rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 960px) {
+  .planner-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .planner-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .planner-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .budget-panel .budget-list li strong {
+    white-space: normal;
+  }
+}

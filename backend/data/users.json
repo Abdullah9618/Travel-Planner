@@ -3,10 +3,70 @@
     "id": 1,
     "email": "admin@travelplanner.com",
     "name": "Admin",
-    "password": "scrypt:32768:8:1$PlainTextForDemo$admin123",
+    "password": "scrypt:32768:8:1$BZnqmsUhxTeQ0wJx$d386390f2ba7333f3c680f9e4d9d2f79a8d4b0f1937903ada36a38c49e60aea2bfb23bc20dd02bce225b075620c50d4cf916ddc37a12a627a760442255d28c62",
     "preferences": {},
     "saved_trips": [],
     "history": [],
     "role": "admin"
+  },
+  {
+    "id": 2,
+    "email": "abdullah1hundred@gmail.com",
+    "name": "Abdullah Shahid",
+    "password": "scrypt:32768:8:1$KbiieGwaIzAsAQHC$3446012596ad0dded5cf7c6a37c2d574760987463bcb863b549701bc006435a0eb51bdd3ed07741a81fc2f3924c6113da048a3a10fdcb0830e3ee05896164649",
+    "preferences": {
+      "budget_range": {
+        "min": 10000,
+        "max": 50000
+      },
+      "travel_style": [],
+      "duration": 3
+    },
+    "saved_trips": [
+      {
+        "id": 1,
+        "destination": "Malam Jabba",
+        "days": 3,
+        "budget_estimate": {
+          "activities": 2500,
+          "days": 3,
+          "hotel": 10500,
+          "meals": 3600,
+          "total": 22600,
+          "travel": 6000
+        },
+        "saved_at": "2026-03-01T12:12:24.033Z"
+      },
+      {
+        "id": 2,
+        "destination": "Malam Jabba",
+        "days": 3,
+        "budget_estimate": {
+          "activities": 2500,
+          "days": 3,
+          "hotel": 10500,
+          "meals": 3600,
+          "total": 22600,
+          "travel": 6000
+        },
+        "saved_at": "2026-03-01T12:12:30.373Z"
+      },
+      {
+        "id": 3,
+        "destination": "Fairy Meadows",
+        "days": 3,
+        "budget_estimate": {
+          "activities": 3000,
+          "days": 3,
+          "hotel": 12000,
+          "meals": 4500,
+          "total": 27500,
+          "travel": 8000
+        },
+        "saved_at": "2026-03-12T02:44:06.947Z"
+      }
+    ],
+    "history": [],
+    "role": "user"
   }
 ]

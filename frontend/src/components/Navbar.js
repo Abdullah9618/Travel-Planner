@@ -35,6 +35,11 @@ const Navbar = () => {
               Home
             </Link>
           </li>
+          <li className="nav-item">
+            <Link to="/planner" className="nav-link" onClick={() => setIsOpen(false)}>
+              Plan My Trip
+            </Link>
+          </li>
           
           {isAuthenticated ? (
             <>

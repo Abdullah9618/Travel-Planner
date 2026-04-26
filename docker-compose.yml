@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: travelbuddy
+      MYSQL_USER: traveluser
+      MYSQL_PASSWORD: travelpass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://traveluser:travelpass@mysql:3306/travelbuddy}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-please-change-this-secret-key-1234567890}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+      MAPTILER_API_KEY: ${MAPTILER_API_KEY:-}
+      TRAVELADVISOR_API_KEY: ${TRAVELADVISOR_API_KEY:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    depends_on:
+      - mysql
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  mysql_data:

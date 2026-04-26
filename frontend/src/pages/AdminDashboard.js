@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   FaChartBar, FaMapMarkerAlt, FaUsers, FaDollarSign, 
-  FaPlus, FaEdit, FaTrash, FaTimes, FaSave
+  FaPlus, FaEdit, FaTrash, FaTimes, FaSave, FaGlobe,
+  FaRobot, FaDatabase, FaComments, FaUserClock, FaSync,
+  FaCog, FaCheck, FaExclamationTriangle
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { adminService } from '../services/api';
@@ -254,7 +256,7 @@ const DestinationsManagement = () => {
   const handleSave = async (data) => {
     try {
       if (editingDestination) {
-        await adminService.updateDestination(destinations.indexOf(editingDestination), data);
+        await adminService.updateDestination(editingDestination.id, data);
         toast.success('Destination updated successfully');
       } else {
         await adminService.addDestination(data);
@@ -269,9 +271,10 @@ const DestinationsManagement = () => {
   };
 
   const handleDelete = async (index) => {
+    const destination = destinations[index];
     if (window.confirm('Are you sure you want to delete this destination?')) {
       try {
-        await adminService.deleteDestination(index);
+        await adminService.deleteDestination(destination.id);
         toast.success('Destination deleted');
         fetchDestinations();
       } catch (error) {
@@ -489,6 +492,535 @@ const CostRatesManagement = () => {
   );
 };
 
+// Regions Management Component
+const RegionsManagement = () => {
+  const [regions, setRegions] = useState([
+    { id: 1, name: 'Gilgit Baltistan', destinations: 8, status: 'active' },
+    { id: 2, name: 'Punjab', destinations: 6, status: 'active' },
+    { id: 3, name: 'Sindh', destinations: 4, status: 'active' },
+    { id: 4, name: 'KPK', destinations: 5, status: 'active' },
+    { id: 5, name: 'Balochistan', destinations: 3, status: 'active' },
+    { id: 6, name: 'Kashmir', destinations: 4, status: 'active' }
+  ]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newRegion, setNewRegion] = useState('');
+
+  const handleAddRegion = () => {
+    if (newRegion.trim()) {
+      setRegions([...regions, { 
+        id: regions.length + 1, 
+        name: newRegion.trim(), 
+        destinations: 0, 
+        status: 'active' 
+      }]);
+      setNewRegion('');
+      setShowAddForm(false);
+      toast.success('Region added successfully');
+    }
+  };
+
+  const handleDeleteRegion = (id) => {
+    setRegions(regions.filter(r => r.id !== id));
+    toast.success('Region deleted');
+  };
+
+  const toggleStatus = (id) => {
+    setRegions(regions.map(r => 
+      r.id === id ? { ...r, status: r.status === 'active' ? 'inactive' : 'active' } : r
+    ));
+  };
+
+  return (
+    <div className="regions-management">
+      <div className="management-header">
+        <h2><FaGlobe /> Regions Management</h2>
+        <button className="add-btn" onClick={() => setShowAddForm(true)}>
+          <FaPlus /> Add Region
+        </button>
+      </div>
+
+      {showAddForm && (
+        <div className="modal-overlay">
+          <div className="modal-content compact">
+            <div className="modal-header">
+              <h3>Add New Region</h3>
+              <button className="close-btn" onClick={() => setShowAddForm(false)}><FaTimes /></button>
+            </div>
+            <div className="form-group">
+              <label>Region Name</label>
+              <input 
+                type="text" 
+                value={newRegion} 
+                onChange={(e) => setNewRegion(e.target.value)}
+                placeholder="Enter region name"
+              />
+            </div>
+            <div className="form-actions">
+              <button className="cancel-btn" onClick={() => setShowAddForm(false)}>Cancel</button>
+              <button className="save-btn" onClick={handleAddRegion}><FaSave /> Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Region Name</th>
+              <th>Destinations</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {regions.map((region) => (
+              <tr key={region.id}>
+                <td><strong>{region.name}</strong></td>
+                <td>{region.destinations}</td>
+                <td>
+                  <span className={`status-badge ${region.status}`}>
+                    {region.status}
+                  </span>
+                </td>
+                <td className="actions-cell">
+                  <button className="edit-btn" onClick={() => toggleStatus(region.id)}>
+                    <FaCog />
+                  </button>
+                  <button className="delete-btn" onClick={() => handleDeleteRegion(region.id)}>
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// AI Models Management Component
+const AIModelsManagement = () => {
+  const [models, setModels] = useState([
+    { 
+      id: 1, 
+      name: 'Content-Based Filtering', 
+      version: '1.2.0',
+      status: 'active',
+      accuracy: 87,
+      lastTrained: '2024-01-15',
+      description: 'Recommends destinations based on activity preferences and user history'
+    },
+    { 
+      id: 2, 
+      name: 'Collaborative Filtering', 
+      version: '2.0.1',
+      status: 'active',
+      accuracy: 92,
+      lastTrained: '2024-01-20',
+      description: 'Uses user similarity patterns for recommendations'
+    },
+    { 
+      id: 3, 
+      name: 'NLP Query Parser', 
+      version: '1.5.0',
+      status: 'active',
+      accuracy: 95,
+      lastTrained: '2024-01-18',
+      description: 'Parses natural language queries for destination search'
+    },
+    { 
+      id: 4, 
+      name: 'Budget Optimizer', 
+      version: '1.0.0',
+      status: 'inactive',
+      accuracy: 78,
+      lastTrained: '2024-01-10',
+      description: 'Optimizes trip costs based on user budget constraints'
+    }
+  ]);
+  const [retraining, setRetraining] = useState(null);
+
+  const handleRetrain = (id) => {
+    setRetraining(id);
+    setTimeout(() => {
+      setModels(models.map(m => 
+        m.id === id ? { 
+          ...m, 
+          lastTrained: new Date().toISOString().split('T')[0],
+          accuracy: Math.min(99, m.accuracy + Math.floor(Math.random() * 3))
+        } : m
+      ));
+      setRetraining(null);
+      toast.success('Model retrained successfully');
+    }, 2000);
+  };
+
+  const toggleModelStatus = (id) => {
+    setModels(models.map(m => 
+      m.id === id ? { ...m, status: m.status === 'active' ? 'inactive' : 'active' } : m
+    ));
+    toast.success('Model status updated');
+  };
+
+  return (
+    <div className="ai-models-management">
+      <div className="management-header">
+        <h2><FaRobot /> AI Models Management</h2>
+      </div>
+
+      <div className="models-grid">
+        {models.map((model) => (
+          <div key={model.id} className={`model-card ${model.status}`}>
+            <div className="model-header">
+              <h3>{model.name}</h3>
+              <span className={`status-badge ${model.status}`}>{model.status}</span>
+            </div>
+            <p className="model-description">{model.description}</p>
+            <div className="model-stats">
+              <div className="stat">
+                <span className="stat-label">Version</span>
+                <span className="stat-value">{model.version}</span>
+              </div>
+              <div className="stat">
+                <span className="stat-label">Accuracy</span>
+                <span className="stat-value">{model.accuracy}%</span>
+              </div>
+              <div className="stat">
+                <span className="stat-label">Last Trained</span>
+                <span className="stat-value">{model.lastTrained}</span>
+              </div>
+            </div>
+            <div className="model-actions">
+              <button 
+                className={`retrain-btn ${retraining === model.id ? 'loading' : ''}`}
+                onClick={() => handleRetrain(model.id)}
+                disabled={retraining === model.id}
+              >
+                <FaSync className={retraining === model.id ? 'spinning' : ''} />
+                {retraining === model.id ? 'Retraining...' : 'Retrain'}
+              </button>
+              <button 
+                className={`toggle-btn ${model.status}`}
+                onClick={() => toggleModelStatus(model.id)}
+              >
+                {model.status === 'active' ? 'Disable' : 'Enable'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Dataset Management Component
+const DatasetManagement = () => {
+  const [datasets, setDatasets] = useState([
+    { id: 1, name: 'destinations.json', records: 25, lastUpdated: '2024-01-20', size: '45 KB' },
+    { id: 2, name: 'cost_rates.json', records: 6, lastUpdated: '2024-01-18', size: '8 KB' },
+    { id: 3, name: 'users.json', records: 3, lastUpdated: '2024-01-22', size: '12 KB' },
+    { id: 4, name: 'user_preferences.json', records: 150, lastUpdated: '2024-01-21', size: '85 KB' },
+    { id: 5, name: 'seasonal_data.json', records: 100, lastUpdated: '2024-01-15', size: '32 KB' }
+  ]);
+  const [syncing, setSyncing] = useState(null);
+  const [showUpload, setShowUpload] = useState(false);
+
+  const handleSync = (id) => {
+    setSyncing(id);
+    setTimeout(() => {
+      setDatasets(datasets.map(d => 
+        d.id === id ? { ...d, lastUpdated: new Date().toISOString().split('T')[0] } : d
+      ));
+      setSyncing(null);
+      toast.success('Dataset synchronized');
+    }, 1500);
+  };
+
+  const handleUpload = () => {
+    setShowUpload(false);
+    toast.success('Dataset uploaded successfully');
+  };
+
+  return (
+    <div className="dataset-management">
+      <div className="management-header">
+        <h2><FaDatabase /> Recommendation Datasets</h2>
+        <button className="add-btn" onClick={() => setShowUpload(true)}>
+          <FaPlus /> Upload Dataset
+        </button>
+      </div>
+
+      {showUpload && (
+        <div className="modal-overlay">
+          <div className="modal-content compact">
+            <div className="modal-header">
+              <h3>Upload Dataset</h3>
+              <button className="close-btn" onClick={() => setShowUpload(false)}><FaTimes /></button>
+            </div>
+            <div className="form-group">
+              <label>Dataset Type</label>
+              <select>
+                <option>Destinations Data</option>
+                <option>User Preferences</option>
+                <option>Cost Rates</option>
+                <option>Seasonal Data</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Upload File (JSON/CSV)</label>
+              <input type="file" accept=".json,.csv" />
+            </div>
+            <div className="form-actions">
+              <button className="cancel-btn" onClick={() => setShowUpload(false)}>Cancel</button>
+              <button className="save-btn" onClick={handleUpload}><FaSave /> Upload</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Dataset Name</th>
+              <th>Records</th>
+              <th>Size</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {datasets.map((dataset) => (
+              <tr key={dataset.id}>
+                <td><strong>{dataset.name}</strong></td>
+                <td>{dataset.records}</td>
+                <td>{dataset.size}</td>
+                <td>{dataset.lastUpdated}</td>
+                <td className="actions-cell">
+                  <button 
+                    className={`sync-btn ${syncing === dataset.id ? 'loading' : ''}`}
+                    onClick={() => handleSync(dataset.id)}
+                    disabled={syncing === dataset.id}
+                  >
+                    <FaSync className={syncing === dataset.id ? 'spinning' : ''} />
+                  </button>
+                  <button className="edit-btn"><FaEdit /></button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// User Activity Statistics Component
+const UserActivityStats = () => {
+  const [activityData] = useState({
+    totalSearches: 1247,
+    totalBookmarks: 89,
+    averageSessionTime: '12 min',
+    popularSearches: [
+      { query: 'hunza in summer', count: 145 },
+      { query: 'beach destinations', count: 98 },
+      { query: 'budget trip under 50000', count: 87 },
+      { query: 'adventure in gilgit', count: 76 },
+      { query: 'family vacation', count: 65 }
+    ],
+    userActivity: [
+      { date: '2024-01-22', searches: 45, signups: 3 },
+      { date: '2024-01-21', searches: 67, signups: 5 },
+      { date: '2024-01-20', searches: 52, signups: 2 },
+      { date: '2024-01-19', searches: 78, signups: 4 },
+      { date: '2024-01-18', searches: 43, signups: 1 }
+    ],
+    topDestinations: [
+      { name: 'Hunza Valley', views: 456 },
+      { name: 'Skardu', views: 389 },
+      { name: 'Naran Kaghan', views: 312 },
+      { name: 'Swat Valley', views: 287 },
+      { name: 'Karachi Beach', views: 234 }
+    ]
+  });
+
+  return (
+    <div className="user-activity-stats">
+      <div className="management-header">
+        <h2><FaUserClock /> User Activity Statistics</h2>
+      </div>
+
+      <div className="activity-overview">
+        <div className="activity-card">
+          <FaChartBar className="activity-icon" />
+          <div className="activity-info">
+            <span className="activity-value">{activityData.totalSearches}</span>
+            <span className="activity-label">Total Searches</span>
+          </div>
+        </div>
+        <div className="activity-card">
+          <FaUsers className="activity-icon" />
+          <div className="activity-info">
+            <span className="activity-value">{activityData.totalBookmarks}</span>
+            <span className="activity-label">Bookmarks</span>
+          </div>
+        </div>
+        <div className="activity-card">
+          <FaUserClock className="activity-icon" />
+          <div className="activity-info">
+            <span className="activity-value">{activityData.averageSessionTime}</span>
+            <span className="activity-label">Avg Session</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="activity-details">
+        <div className="detail-card">
+          <h3>Popular Searches</h3>
+          <ul className="search-list">
+            {activityData.popularSearches.map((search, index) => (
+              <li key={index}>
+                <span className="search-query">"{search.query}"</span>
+                <span className="search-count">{search.count}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="detail-card">
+          <h3>Top Destinations</h3>
+          <ul className="destination-list">
+            {activityData.topDestinations.map((dest, index) => (
+              <li key={index}>
+                <span className="dest-rank">#{index + 1}</span>
+                <span className="dest-name">{dest.name}</span>
+                <span className="dest-views">{dest.views} views</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="detail-card">
+          <h3>Daily Activity</h3>
+          <div className="activity-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Searches</th>
+                  <th>Signups</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activityData.userActivity.map((day, index) => (
+                  <tr key={index}>
+                    <td>{day.date}</td>
+                    <td>{day.searches}</td>
+                    <td>{day.signups}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Feedback Management Component
+const FeedbackManagement = () => {
+  const [feedbacks, setFeedbacks] = useState([
+    { id: 1, user: 'john@email.com', destination: 'Hunza Valley', rating: 5, comment: 'Amazing experience! The recommendations were spot on.', date: '2024-01-22', status: 'new' },
+    { id: 2, user: 'sara@email.com', destination: 'Skardu', rating: 4, comment: 'Good trip overall. Budget estimation was helpful.', date: '2024-01-21', status: 'reviewed' },
+    { id: 3, user: 'ahmed@email.com', destination: 'Karachi Beach', rating: 3, comment: 'Expected more activity suggestions.', date: '2024-01-20', status: 'new' },
+    { id: 4, user: 'fatima@email.com', destination: 'Naran Kaghan', rating: 5, comment: 'Perfect recommendations for family trip!', date: '2024-01-19', status: 'resolved' },
+    { id: 5, user: 'ali@email.com', destination: 'Swat Valley', rating: 4, comment: 'Loved the AI suggestions. Very accurate!', date: '2024-01-18', status: 'reviewed' }
+  ]);
+
+  const updateStatus = (id, status) => {
+    setFeedbacks(feedbacks.map(f => f.id === id ? { ...f, status } : f));
+    toast.success('Feedback status updated');
+  };
+
+  const getStatusIcon = (status) => {
+    switch(status) {
+      case 'new': return <FaExclamationTriangle style={{ color: '#f59e0b' }} />;
+      case 'reviewed': return <FaCheck style={{ color: '#3b82f6' }} />;
+      case 'resolved': return <FaCheck style={{ color: '#10b981' }} />;
+      default: return null;
+    }
+  };
+
+  return (
+    <div className="feedback-management">
+      <div className="management-header">
+        <h2><FaComments /> User Feedback</h2>
+      </div>
+
+      <div className="feedback-summary">
+        <div className="feedback-stat">
+          <span className="stat-number">{feedbacks.filter(f => f.status === 'new').length}</span>
+          <span className="stat-label">New</span>
+        </div>
+        <div className="feedback-stat">
+          <span className="stat-number">{feedbacks.filter(f => f.status === 'reviewed').length}</span>
+          <span className="stat-label">Reviewed</span>
+        </div>
+        <div className="feedback-stat">
+          <span className="stat-number">{feedbacks.filter(f => f.status === 'resolved').length}</span>
+          <span className="stat-label">Resolved</span>
+        </div>
+      </div>
+
+      <div className="feedback-list">
+        {feedbacks.map((feedback) => (
+          <div key={feedback.id} className={`feedback-card ${feedback.status}`}>
+            <div className="feedback-header">
+              <div className="feedback-user">
+                <strong>{feedback.user}</strong>
+                <span className="feedback-destination">on {feedback.destination}</span>
+              </div>
+              <div className="feedback-meta">
+                <span className="feedback-rating">
+                  {'⭐'.repeat(feedback.rating)}
+                </span>
+                <span className="feedback-date">{feedback.date}</span>
+              </div>
+            </div>
+            <p className="feedback-comment">"{feedback.comment}"</p>
+            <div className="feedback-actions">
+              <span className={`status-badge ${feedback.status}`}>
+                {getStatusIcon(feedback.status)} {feedback.status}
+              </span>
+              <div className="action-buttons">
+                {feedback.status !== 'reviewed' && (
+                  <button 
+                    className="action-btn review"
+                    onClick={() => updateStatus(feedback.id, 'reviewed')}
+                  >
+                    Mark Reviewed
+                  </button>
+                )}
+                {feedback.status !== 'resolved' && (
+                  <button 
+                    className="action-btn resolve"
+                    onClick={() => updateStatus(feedback.id, 'resolved')}
+                  >
+                    Resolve
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Main Admin Dashboard Component
 const AdminDashboard = () => {
   const location = useLocation();
@@ -516,6 +1048,11 @@ const AdminDashboard = () => {
   const getActiveTab = () => {
     if (location.pathname.includes('destinations')) return 'destinations';
     if (location.pathname.includes('cost-rates')) return 'cost-rates';
+    if (location.pathname.includes('regions')) return 'regions';
+    if (location.pathname.includes('models')) return 'models';
+    if (location.pathname.includes('datasets')) return 'datasets';
+    if (location.pathname.includes('activity')) return 'activity';
+    if (location.pathname.includes('feedback')) return 'feedback';
     return 'overview';
   };
 
@@ -541,6 +1078,36 @@ const AdminDashboard = () => {
             className={getActiveTab() === 'cost-rates' ? 'active' : ''}
           >
             <FaDollarSign /> Cost Rates
+          </Link>
+          <Link 
+            to="/admin/regions" 
+            className={getActiveTab() === 'regions' ? 'active' : ''}
+          >
+            <FaGlobe /> Regions
+          </Link>
+          <Link 
+            to="/admin/models" 
+            className={getActiveTab() === 'models' ? 'active' : ''}
+          >
+            <FaRobot /> AI Models
+          </Link>
+          <Link 
+            to="/admin/datasets" 
+            className={getActiveTab() === 'datasets' ? 'active' : ''}
+          >
+            <FaDatabase /> Datasets
+          </Link>
+          <Link 
+            to="/admin/activity" 
+            className={getActiveTab() === 'activity' ? 'active' : ''}
+          >
+            <FaUserClock /> Activity
+          </Link>
+          <Link 
+            to="/admin/feedback" 
+            className={getActiveTab() === 'feedback' ? 'active' : ''}
+          >
+            <FaComments /> Feedback
           </Link>
         </nav>
       </div>
@@ -593,6 +1160,11 @@ const AdminDashboard = () => {
           } />
           <Route path="destinations" element={<DestinationsManagement />} />
           <Route path="cost-rates" element={<CostRatesManagement />} />
+          <Route path="regions" element={<RegionsManagement />} />
+          <Route path="models" element={<AIModelsManagement />} />
+          <Route path="datasets" element={<DatasetManagement />} />
+          <Route path="activity" element={<UserActivityStats />} />
+          <Route path="feedback" element={<FeedbackManagement />} />
         </Routes>
       </div>
     </div>

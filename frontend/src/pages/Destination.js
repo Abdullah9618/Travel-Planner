@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   FaStar, FaMapMarkerAlt, FaCalendarAlt, FaShieldAlt, 
@@ -22,17 +22,7 @@ const Destination = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    fetchDestination();
-  }, [id]);
-
-  useEffect(() => {
-    if (destination) {
-      fetchBudgetEstimate();
-    }
-  }, [destination, selectedDays]);
-
-  const fetchDestination = async () => {
+  const fetchDestination = useCallback(async () => {
     setLoading(true);
     try {
       // Try to get by ID first, then by name
@@ -61,16 +51,26 @@ const Destination = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchBudgetEstimate = async () => {
+  const fetchBudgetEstimate = useCallback(async () => {
     try {
       const response = await budgetService.estimate(destination.name, selectedDays);
       setBudgetEstimate(response.data.budget_breakdown);
     } catch (error) {
       console.error('Error fetching budget:', error);
     }
-  };
+  }, [destination, selectedDays]);
+
+  useEffect(() => {
+    fetchDestination();
+  }, [fetchDestination]);
+
+  useEffect(() => {
+    if (destination) {
+      fetchBudgetEstimate();
+    }
+  }, [destination, selectedDays, fetchBudgetEstimate]);
 
   const handleSaveTrip = async () => {
     if (!isAuthenticated) {
@@ -136,9 +136,23 @@ const Destination = () => {
     );
   }
 
+  // Image mapping for destinations - optimized for fast loading
+  const placeholderImages = {
+    'Hunza Valley': 'https://picsum.photos/seed/hunza/1200/600',
+    'Gwadar Beach': 'https://picsum.photos/seed/beach/1200/600',
+    'Murree': 'https://picsum.photos/seed/hills/1200/600',
+    'Skardu': 'https://picsum.photos/seed/mountains/1200/600',
+    'Swat Valley': 'https://picsum.photos/seed/valley/1200/600',
+    'Naran Kaghan': 'https://picsum.photos/seed/lake/1200/600',
+    'Lahore': 'https://picsum.photos/seed/city/1200/600',
+    'Islamabad': 'https://picsum.photos/seed/capital/1200/600',
+    'Karachi': 'https://picsum.photos/seed/karachi/1200/600',
+    'Fairy Meadows': 'https://picsum.photos/seed/meadows/1200/600',
+  };
+
   const imageUrl = destination.image?.startsWith('http') 
     ? destination.image 
-    : `https://source.unsplash.com/1200x600/?${encodeURIComponent(destination.name + ' pakistan landscape')}`;
+    : (placeholderImages[destination.name] || `https://picsum.photos/seed/${encodeURIComponent(destination.name)}/1200/600`);
 
   return (
     <div className="destination-page">
@@ -149,7 +163,7 @@ const Destination = () => {
           alt={destination.name} 
           className="hero-image"
           onError={(e) => {
-            e.target.src = `https://via.placeholder.com/1200x600?text=${encodeURIComponent(destination.name)}`;
+            e.target.src = `https://picsum.photos/seed/${encodeURIComponent(destination.name)}/1200/600`;
           }}
         />
         <div className="hero-overlay"></div>
