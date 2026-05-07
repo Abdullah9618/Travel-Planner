@@ -15,7 +15,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 from recommendation_engine import RecommendationEngine
 from nlp_parser import QueryParser
-from persistence import build_persistence, db_load_json, db_save_json, seed_from_file_if_missing
+from mongodb_persistence import build_mongodb_persistence
 from integration_services import (
     generate_itinerary,
     get_live_weather,
@@ -42,36 +42,93 @@ jwt = JWTManager(app)
 recommendation_engine = RecommendationEngine()
 query_parser = QueryParser()
 
-# Data file paths
+# Initialize MongoDB persistence
+MONGO_DB = build_mongodb_persistence()
+
+# Data collection names in MongoDB
+DESTINATIONS_COLLECTION = "destinations"
+USERS_COLLECTION = "users"
+COST_RATES_COLLECTION = "cost_rates"
+
+# Data file paths (kept for backward compatibility / seeding)
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 DESTINATIONS_FILE = os.path.join(DATA_DIR, 'destinations.json')
 USERS_FILE = os.path.join(DATA_DIR, 'users.json')
 COST_RATES_FILE = os.path.join(DATA_DIR, 'cost_rates.json')
-PERSISTENCE = build_persistence(os.path.dirname(__file__))
 
-for _dataset in [DESTINATIONS_FILE, USERS_FILE, COST_RATES_FILE]:
-    seed_from_file_if_missing(PERSISTENCE, _dataset)
+# Seed MongoDB from JSON files if collections are empty
+def seed_mongodb():
+    """Load initial data from JSON files into MongoDB if collections are empty."""
+    for filepath, collection_name in [
+        (DESTINATIONS_FILE, DESTINATIONS_COLLECTION),
+        (USERS_FILE, USERS_COLLECTION),
+        (COST_RATES_FILE, COST_RATES_COLLECTION)
+    ]:
+        if os.path.exists(filepath):
+            collection = MONGO_DB.get_collection(collection_name)
+            if collection.count_documents({}) == 0:
+                try:
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    collection.insert_one({"_id": collection_name, "payload": data})
+                    print(f"[OK] Seeded {collection_name} from {filepath}")
+                except Exception as e:
+                    print(f"[ERROR] Error seeding {collection_name}: {e}")
+
+seed_mongodb()
 
 # Helper functions
-def load_json(filepath):
-    """Load JSON data from file"""
-    db_data = db_load_json(PERSISTENCE, filepath)
-    if db_data is not None:
-        return db_data
+def load_json(collection_name):
+    """Load JSON data from MongoDB collection.
+    
+    Args:
+        collection_name: Name of MongoDB collection to load from
+    """
+    data = MONGO_DB.load_json(collection_name, collection_name)
+    if data is not None:
+        return data
+    
+    # Fallback to file if collection is empty
+    filepath_map = {
+        DESTINATIONS_COLLECTION: DESTINATIONS_FILE,
+        USERS_COLLECTION: USERS_FILE,
+        COST_RATES_COLLECTION: COST_RATES_FILE,
+    }
+    filepath = filepath_map.get(collection_name)
+    if filepath and os.path.exists(filepath):
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
+    
+    return [] if collection_name in [USERS_COLLECTION, DESTINATIONS_COLLECTION] else {}
 
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
-
-def save_json(filepath, data):
-    """Save data to JSON file"""
-    db_save_json(PERSISTENCE, filepath, data)
-
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+def save_json(collection_name, data):
+    """Save data to MongoDB collection.
+    
+    Args:
+        collection_name: Name of MongoDB collection to save to
+        data: Data to save
+    """
+    success = MONGO_DB.save_json(collection_name, collection_name, data)
+    if not success:
+        print(f"Warning: Failed to save to MongoDB collection {collection_name}")
+    
+    # Also save to file for backup
+    filepath_map = {
+        DESTINATIONS_COLLECTION: DESTINATIONS_FILE,
+        USERS_COLLECTION: USERS_FILE,
+        COST_RATES_COLLECTION: COST_RATES_FILE,
+    }
+    filepath = filepath_map.get(collection_name)
+    if filepath:
+        try:
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"Warning: Failed to save backup file {filepath}: {e}")
 
 
 def get_user_by_email(users, email):
@@ -115,7 +172,7 @@ def search_trips():
     parsed = query_parser.parse(query)
     
     # Get destinations matching criteria
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     
     # Filter destinations based on parsed parameters
     filtered = []
@@ -131,7 +188,7 @@ def search_trips():
             filtered.append(dest)
     
     # Generate budget estimation for each destination
-    cost_rates = load_json(COST_RATES_FILE)
+    cost_rates = load_json(COST_RATES_COLLECTION)
     days = parsed.get('days', 3)
     
     results = []
@@ -152,7 +209,7 @@ def search_trips():
 @app.route('/api/destinations', methods=['GET'])
 def get_destinations():
     """Get all destinations or filter by parameters"""
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     
     # Optional filtering
     region = request.args.get('region')
@@ -173,7 +230,7 @@ def get_destinations():
 @app.route('/api/destinations/<int:dest_id>', methods=['GET'])
 def get_destination(dest_id):
     """Get single destination by ID"""
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     destination = get_destination_by_id(destinations, dest_id)
     if destination:
         return jsonify(destination)
@@ -185,7 +242,7 @@ def get_recommendations():
     Get personalized destination recommendations
     Uses ML-based content filtering and collaborative filtering
     """
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     
     if request.method == 'POST':
         data = request.json
@@ -207,7 +264,7 @@ def get_recommendations():
 @app.route('/api/travel-suggestions', methods=['GET'])
 def get_travel_suggestions():
     """Get real-time travel suggestions for homepage"""
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     
     suggestions = [
         {
@@ -234,7 +291,7 @@ def get_travel_suggestions():
 @app.route('/api/home/insights', methods=['GET'])
 def get_home_insights():
     """Get featured destinations, weather highlights, and travel advisories for the home page."""
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     featured = recommendation_engine.get_popular_destinations(destinations, num=4)
 
     weather_highlights = []
@@ -272,7 +329,7 @@ def get_home_insights():
 @app.route('/api/weather/highlights', methods=['GET'])
 def get_weather_highlights():
     """Return live weather snapshots for a region or all featured destinations."""
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     region = request.args.get('region')
 
     if region:
@@ -319,8 +376,8 @@ def generate_itinerary_route():
     budget = data.get('budget')
     preferences = data.get('preferences') or {}
 
-    destinations = load_json(DESTINATIONS_FILE)
-    cost_rates = load_json(COST_RATES_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
+    cost_rates = load_json(COST_RATES_COLLECTION)
 
     parsed = query_parser.parse(query) if query else {}
     if not destination_name and parsed.get('destination'):
@@ -384,7 +441,7 @@ def register():
     if not all([email, name, password]):
         return jsonify({'error': 'All fields are required'}), 400
     
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     
     # Check if user already exists
     if any(u['email'] == email for u in users):
@@ -407,7 +464,7 @@ def register():
     }
     
     users.append(new_user)
-    save_json(USERS_FILE, users)
+    save_json(USERS_COLLECTION, users)
     
     # Generate token
     access_token = create_access_token(identity=email)
@@ -425,7 +482,7 @@ def login():
     email = data.get('email')
     password = data.get('password')
     
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, email)
     
     if not user or not check_password_hash(user['password'], password):
@@ -463,7 +520,7 @@ def google_login():
     if not email:
         return jsonify({'error': 'Google account email is unavailable'}), 400
 
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, email)
 
     if not user:
@@ -483,7 +540,7 @@ def google_login():
             'auth_provider': 'google'
         }
         users.append(user)
-        save_json(USERS_FILE, users)
+        save_json(USERS_COLLECTION, users)
 
     access_token = create_access_token(identity=email)
     return jsonify({
@@ -497,7 +554,7 @@ def google_login():
 def get_profile():
     """Get current user profile"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
     
     if not user:
@@ -513,7 +570,7 @@ def get_profile():
 def get_history():
     """Get current user travel history"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
 
     if not user:
@@ -528,7 +585,7 @@ def update_profile():
     current_user_email = get_jwt_identity()
     data = request.json
     
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user_index = next((i for i, u in enumerate(users) if u['email'] == current_user_email), None)
     
     if user_index is None:
@@ -540,7 +597,7 @@ def update_profile():
     if 'preferences' in data:
         users[user_index]['preferences'].update(data['preferences'])
     
-    save_json(USERS_FILE, users)
+    save_json(USERS_COLLECTION, users)
     
     return jsonify({
         'message': 'Profile updated successfully',
@@ -554,7 +611,7 @@ def save_trip():
     current_user_email = get_jwt_identity()
     data = request.json
     
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user_index = next((i for i, u in enumerate(users) if u['email'] == current_user_email), None)
     
     if user_index is None:
@@ -577,7 +634,7 @@ def save_trip():
         'saved_at': data.get('saved_at'),
         'action': 'saved'
     })
-    save_json(USERS_FILE, users)
+    save_json(USERS_COLLECTION, users)
     
     return jsonify({
         'message': 'Trip saved successfully',
@@ -614,8 +671,8 @@ def estimate_budget():
     destination_name = data.get('destination')
     days = data.get('days', 3)
     
-    destinations = load_json(DESTINATIONS_FILE)
-    cost_rates = load_json(COST_RATES_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
+    cost_rates = load_json(COST_RATES_COLLECTION)
     
     destination = next((d for d in destinations if d['name'].lower() == destination_name.lower()), None)
     
@@ -642,13 +699,13 @@ def estimate_budget():
 def admin_get_destinations():
     """Admin: Get all destinations"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
     
     if not user or user.get('role') != 'admin':
         return jsonify({'error': 'Admin access required'}), 403
     
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     return jsonify(destinations)
 
 @app.route('/api/admin/destinations', methods=['POST'])
@@ -656,14 +713,14 @@ def admin_get_destinations():
 def admin_add_destination():
     """Admin: Add new destination"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
     
     if not user or user.get('role') != 'admin':
         return jsonify({'error': 'Admin access required'}), 403
     
     data = request.json
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     next_id = max([d.get('id', 0) for d in destinations], default=0) + 1
     
     new_destination = {
@@ -682,7 +739,7 @@ def admin_add_destination():
     }
     
     destinations.append(new_destination)
-    save_json(DESTINATIONS_FILE, destinations)
+    save_json(DESTINATIONS_COLLECTION, destinations)
     
     return jsonify({'message': 'Destination added successfully', 'destination': new_destination}), 201
 
@@ -691,14 +748,14 @@ def admin_add_destination():
 def admin_update_destination(dest_id):
     """Admin: Update destination"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
     
     if not user or user.get('role') != 'admin':
         return jsonify({'error': 'Admin access required'}), 403
     
     data = request.json
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     destination = get_destination_by_id(destinations, dest_id)
 
     if not destination:
@@ -712,7 +769,7 @@ def admin_update_destination(dest_id):
     if 'description' in data:
         destination['description'] = data['description']
     
-    save_json(DESTINATIONS_FILE, destinations)
+    save_json(DESTINATIONS_COLLECTION, destinations)
     
     return jsonify({'message': 'Destination updated', 'destination': destination})
 
@@ -721,13 +778,13 @@ def admin_update_destination(dest_id):
 def admin_delete_destination(dest_id):
     """Admin: Delete destination"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
     
     if not user or user.get('role') != 'admin':
         return jsonify({'error': 'Admin access required'}), 403
     
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     destination = get_destination_by_id(destinations, dest_id)
 
     if not destination:
@@ -735,7 +792,7 @@ def admin_delete_destination(dest_id):
     
     deleted = destination
     destinations = [d for d in destinations if d.get('id') != deleted.get('id')]
-    save_json(DESTINATIONS_FILE, destinations)
+    save_json(DESTINATIONS_COLLECTION, destinations)
     
     return jsonify({'message': 'Destination deleted', 'destination': deleted})
 
@@ -744,13 +801,13 @@ def admin_delete_destination(dest_id):
 def admin_get_stats():
     """Admin: Get user statistics and activity"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
     
     if not user or user.get('role') != 'admin':
         return jsonify({'error': 'Admin access required'}), 403
     
-    destinations = load_json(DESTINATIONS_FILE)
+    destinations = load_json(DESTINATIONS_COLLECTION)
     
     stats = {
         'total_users': len(users),
@@ -771,13 +828,13 @@ def admin_get_stats():
 def admin_get_cost_rates():
     """Admin: Get cost rates"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
     
     if not user or user.get('role') != 'admin':
         return jsonify({'error': 'Admin access required'}), 403
     
-    cost_rates = load_json(COST_RATES_FILE)
+    cost_rates = load_json(COST_RATES_COLLECTION)
     return jsonify(cost_rates)
 
 @app.route('/api/admin/cost-rates', methods=['PUT'])
@@ -785,14 +842,14 @@ def admin_get_cost_rates():
 def admin_update_cost_rates():
     """Admin: Update cost rates"""
     current_user_email = get_jwt_identity()
-    users = load_json(USERS_FILE)
+    users = load_json(USERS_COLLECTION)
     user = get_user_by_email(users, current_user_email)
     
     if not user or user.get('role') != 'admin':
         return jsonify({'error': 'Admin access required'}), 403
     
     data = request.json
-    save_json(COST_RATES_FILE, data)
+    save_json(COST_RATES_COLLECTION, data)
     
     return jsonify({'message': 'Cost rates updated successfully'})
 
@@ -823,6 +880,6 @@ if __name__ == '__main__':
             'history': [],
             'role': 'admin'
         }
-        save_json(USERS_FILE, [admin_user])
+        save_json(USERS_COLLECTION, [admin_user])
     
     app.run(debug=True, port=5000)

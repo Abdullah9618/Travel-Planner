@@ -259,6 +259,37 @@ Services:
 - Backend API: `http://localhost:5000`
 - MySQL: `localhost:3306`
 
+## 🚢 Single-Server Docker Deploy
+
+Use this when you want one Docker-based deployment that other people can access over the internet.
+
+### What you need
+- A server or VPS with Docker and Docker Compose installed
+- Your API keys set as environment variables on the server
+- A public IP or domain name
+
+### Steps
+1. Clone the repository on the server.
+2. Create a root `.env` file with your production values:
+  - `DATABASE_URL`
+  - `JWT_SECRET_KEY`
+  - `OPENWEATHER_API_KEY`
+  - `MAPTILER_API_KEY`
+  - `TRAVELADVISOR_API_KEY`
+  - `GOOGLE_CLIENT_ID`
+3. Run:
+  ```bash
+  docker compose up -d --build
+  ```
+4. Open the exposed ports:
+  - `3000` for the frontend
+  - `5000` for the backend
+
+### Notes
+- The current `docker-compose.yml` already supports environment variables, so you do **not** need to hardcode secrets.
+- For a cleaner public URL, place an Nginx reverse proxy or a managed domain in front of the containers.
+- If you want true one-domain access, I can convert this into a single Nginx-fronted Docker setup next.
+
 ### Admin Endpoints (Protected)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
