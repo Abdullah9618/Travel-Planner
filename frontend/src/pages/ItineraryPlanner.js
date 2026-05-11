@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaMapMarkedAlt, FaCloudSun, FaWallet, FaRoute, FaUtensils } from 'react-icons/fa';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { destinationService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -9,27 +9,43 @@ import '../styles/ItineraryPlanner.css';
 
 // Fix default marker icons in many React build setups
 import L from 'leaflet';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
+// Create a custom marker icon with better visibility
+const customIcon = new L.Icon({
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
 
 const defaultCenter = [30.3753, 69.3451];
+
+// Updates map center and zoom dynamically
+function MapUpdater({ center, zoom }) {
+  const map = useMap();
+  map.setView(center, zoom);
+  return null;
+}
 
 const ItineraryPlanner = () => {
   const { isAuthenticated, user } = useAuth();
   const [formData, setFormData] = useState({
     query: '',
     destination: '',
-    days: 3,
-    budget: 25000,
+    days: '',
+    budget: '',
   });
+
   const [itinerary, setItinerary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -47,7 +63,7 @@ const ItineraryPlanner = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'days' || name === 'budget' ? Number(value) : value,
+      [name]: (name === 'days' || name === 'budget') ? (value === '' ? '' : Number(value)) : value,
     }));
   };
 
@@ -78,31 +94,34 @@ const ItineraryPlanner = () => {
 
       <form className="planner-form" onSubmit={handleSubmit}>
         <div className="planner-grid">
-          <div className="form-group">
-            <label>Natural Language Query</label>
+          <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+            <label>AI Command (Natural Language)</label>
             <input
               name="query"
               value={formData.query}
               onChange={handleChange}
-              placeholder="Plan a 3-day trip to northern Pakistan under 25,000 PKR"
+              placeholder="e.g. 'Plan a 3-day trip to northern Pakistan under 25,000 PKR'"
             />
+            <small style={{ color: 'var(--text-secondary)', display: 'block', marginTop: '0.25rem' }}>
+              Our AI will automatically fill out the fields below based on your command, or you can enter them manually!
+            </small>
           </div>
           <div className="form-group">
-            <label>Destination (optional)</label>
+            <label>Destination (Optional)</label>
             <input
               name="destination"
               value={formData.destination}
               onChange={handleChange}
-              placeholder="Hunza Valley"
+              placeholder="e.g. Hunza Valley"
             />
           </div>
           <div className="form-group">
-            <label>Days</label>
-            <input type="number" min="1" max="14" name="days" value={formData.days} onChange={handleChange} />
+            <label>Duration (Days) — Optional</label>
+            <input type="number" min="1" max="14" name="days" value={formData.days} onChange={handleChange} placeholder="e.g. 5" />
           </div>
           <div className="form-group">
-            <label>Budget (PKR)</label>
-            <input type="number" min="5000" step="1000" name="budget" value={formData.budget} onChange={handleChange} />
+            <label>Max Budget (PKR) — Optional</label>
+            <input type="number" min="5000" step="1000" name="budget" value={formData.budget} onChange={handleChange} placeholder="e.g. 30000" />
           </div>
         </div>
 
@@ -192,14 +211,18 @@ const ItineraryPlanner = () => {
 
           <div className="panel map-panel">
             <h3><FaMapMarkedAlt /> Destination Map</h3>
-            <MapContainer center={mapCenter} zoom={6} scrollWheelZoom={true} style={{ height: '320px', width: '100%' }}>
+            <MapContainer center={mapCenter} zoom={10} maxZoom={18} scrollWheelZoom={true} style={{ height: '320px', width: '100%' }}>
+              <MapUpdater center={mapCenter} zoom={itinerary?.map?.center ? 10 : 5} />
               <TileLayer
                 attribution='&copy; OpenStreetMap contributors &copy; MapTiler'
                 url={tileUrl}
+                maxZoom={18}
               />
-              <Marker position={mapCenter}>
+              <Marker position={mapCenter} icon={customIcon}>
                 <Popup>
-                  {itinerary.destination?.name} ({itinerary.destination?.region})
+                  <strong>{itinerary.destination?.name}</strong><br />
+                  {itinerary.destination?.region}<br />
+                  <small>Lat: {mapCenter[0].toFixed(4)}, Lng: {mapCenter[1].toFixed(4)}</small>
                 </Popup>
               </Marker>
             </MapContainer>

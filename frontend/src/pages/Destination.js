@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   FaStar, FaMapMarkerAlt, FaCalendarAlt, FaShieldAlt, 
   FaCloud, FaHeart, FaShare, FaArrowLeft, FaHiking
@@ -13,11 +13,13 @@ import '../styles/Destination.css';
 
 const Destination = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { isAuthenticated, saveTrip } = useAuth();
   
   const [destination, setDestination] = useState(null);
   const [similarDestinations, setSimilarDestinations] = useState([]);
   const [budgetEstimate, setBudgetEstimate] = useState(null);
+  const [currentWeather, setCurrentWeather] = useState(null);
   const [selectedDays, setSelectedDays] = useState(3);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -44,6 +46,21 @@ const Destination = () => {
           .filter(d => d.id !== found.id && (d.type === found.type || d.region === found.region))
           .slice(0, 4);
         setSimilarDestinations(similar);
+
+        // Fetch weather in background so it doesn't delay the main page load
+        destinationService.getWeatherHighlights(found.region)
+          .then(weatherResponse => {
+            const data = weatherResponse.data;
+            if (Array.isArray(data) && data.length > 0) {
+              const item = data.find(d => d.destination === found.name) || data[0];
+              if (item && item.weather) {
+                setCurrentWeather(item.weather);
+              }
+            }
+          })
+          .catch(weatherErr => {
+            console.error('Error fetching weather:', weatherErr);
+          });
       }
     } catch (error) {
       console.error('Error fetching destination:', error);
@@ -168,9 +185,9 @@ const Destination = () => {
         />
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <Link to="/search" className="back-link">
-            <FaArrowLeft /> Back to Search
-          </Link>
+          <a href="#" className="back-link" onClick={(e) => { e.preventDefault(); navigate(-1); }}>
+            <FaArrowLeft /> Back
+          </a>
           <div className="hero-info">
             <span className="type-badge">{destination.type}</span>
             <h1>{destination.name}</h1>
@@ -218,7 +235,9 @@ const Destination = () => {
                 <div className="fact-card">
                   <FaCloud className="fact-icon" />
                   <span className="fact-label">Weather</span>
-                  <span className="fact-value">{destination.weather}</span>
+                  <span className="fact-value">
+                    {currentWeather ? `${currentWeather.temperature}°C, ${currentWeather.condition}` : destination.weather}
+                  </span>
                 </div>
                 <div className="fact-card">
                   <FaCalendarAlt className="fact-icon" />

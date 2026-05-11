@@ -221,8 +221,8 @@ const DestinationForm = ({ destination, onSave, onClose }) => {
           </div>
 
           <div className="form-actions">
-            <button type="button" className="cancel-btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="save-btn"><FaSave /> Save</button>
+            <button type="button" className="admin-cancel-btn" onClick={onClose}>Cancel</button>
+            <button type="submit" className="admin-save-btn"><FaSave /> Save</button>
           </div>
         </form>
       </div>

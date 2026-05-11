@@ -127,12 +127,26 @@ const Profile = () => {
             <div className="preferences-section">
               <div className="section-header">
                 <h2>Travel Preferences</h2>
-                <button 
-                  className="edit-btn"
-                  onClick={() => setEditing(!editing)}
-                >
-                  <FaEdit /> {editing ? 'Cancel' : 'Edit'}
-                </button>
+                <div className="header-actions" style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    className="edit-btn"
+                    onClick={() => setEditing(!editing)}
+                    type="button"
+                  >
+                    <FaEdit /> {editing ? 'Cancel' : 'Edit'}
+                  </button>
+                  {editing && (
+                    <button 
+                      className="edit-btn" 
+                      style={{ background: 'var(--primary-color)', color: 'white' }}
+                      disabled={loading}
+                      onClick={handleSubmit}
+                      type="button"
+                    >
+                      {loading ? 'Saving...' : <><FaSave /> Save</>}
+                    </button>
+                  )}
+                </div>
               </div>
 
               <form onSubmit={handleSubmit} className="preferences-form">
@@ -253,7 +267,7 @@ const Profile = () => {
                 </div>
 
                 {editing && (
-                  <button type="submit" className="save-btn" disabled={loading}>
+                  <button type="submit" className="save-btn" disabled={loading} style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {loading ? 'Saving...' : <><FaSave /> Save Preferences</>}
                   </button>
                 )}

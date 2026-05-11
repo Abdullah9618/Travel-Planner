@@ -68,5 +68,74 @@
     ],
     "history": [],
     "role": "user"
+  },
+  {
+    "id": 3,
+    "email": "bc220425257ash@vu.edu.pk",
+    "name": "Hafiz Shahid",
+    "password": "scrypt:32768:8:1$We0749Pt7XSz9eh9$a57dfab2405ed0ab83d712aa04d7539f45cdcedeeaecdb58d3f70d2db3a37d0309ccb2a8ef1b1a514cdcaafb7d91685e42de3c79d5b3166ddf315d93c1b1d827",
+    "preferences": {
+      "budget_range": {
+        "max": 30000,
+        "min": 10000
+      },
+      "travel_style": [
+        "Family"
+      ],
+      "duration": 3,
+      "weather_preference": "Warm",
+      "preferred_activities": [
+        "Shopping",
+        "Food Tours"
+      ]
+    },
+    "saved_trips": [
+      {
+        "id": 1,
+        "destination": "Khunjerab Pass",
+        "days": 3,
+        "budget_estimate": {
+          "activities": 3000,
+          "days": 3,
+          "hotel": 12000,
+          "meals": 4500,
+          "total": 27500,
+          "travel": 8000
+        },
+        "saved_at": "2026-05-08T17:38:16.648Z"
+      },
+      {
+        "id": 2,
+        "destination": "Murree",
+        "days": 3,
+        "budget_estimate": {
+          "activities": 2000,
+          "days": 3,
+          "hotel": 9000,
+          "meals": 3000,
+          "total": 18000,
+          "travel": 4000
+        },
+        "saved_at": "2026-05-08T17:48:20.854Z"
+      }
+    ],
+    "history": [
+      {
+        "id": 1,
+        "destination": "Khunjerab Pass",
+        "days": 3,
+        "budget_estimate": {
+          "activities": 3000,
+          "days": 3,
+          "hotel": 12000,
+          "meals": 4500,
+          "total": 27500,
+          "travel": 8000
+        },
+        "saved_at": "2026-05-08T17:38:16.648Z",
+        "action": "saved"
+      }
+    ],
+    "role": "user"
   }
 ]

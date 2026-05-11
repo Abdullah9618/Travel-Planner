@@ -21,6 +21,30 @@ REGION_COORDINATES: Dict[str, Tuple[float, float]] = {
     "Sindh": (24.8607, 67.0011),
     "Balochistan": (30.1798, 66.9750),
     "AJK": (34.3753, 73.4716),
+    "Islamabad Capital Territory": (33.6844, 73.0479),
+}
+
+DESTINATION_COORDINATES: Dict[str, Tuple[float, float]] = {
+    "Hunza Valley": (36.3167, 74.6500),
+    "Gwadar Beach": (25.1216, 62.3254),
+    "Murree": (33.9070, 73.3943),
+    "Skardu": (35.2981, 75.6114),
+    "Swat Valley": (35.2227, 72.4258),
+    "Naran Kaghan": (34.9083, 73.6500),
+    "Lahore": (31.5204, 74.3587),
+    "Fairy Meadows": (35.3853, 74.5772),
+    "Neelum Valley": (34.5805, 73.9030),
+    "Karachi": (24.8607, 67.0011),
+    "Taxila": (33.7463, 72.7843),
+    "Malam Jabba": (34.7981, 72.5722),
+    "Deosai National Park": (35.0500, 75.4667),
+    "Mohenjo-daro": (27.3292, 68.1389),
+    "Chitral": (35.8500, 71.7833),
+    "Attabad Lake": (36.3101, 74.8329),
+    "Ziarat": (30.3800, 67.7275),
+    "Nathia Gali": (34.0700, 73.3833),
+    "Khunjerab Pass": (36.8497, 75.4239),
+    "Rawalpindi": (33.5984, 73.0441),
 }
 
 REGION_CITIES: Dict[str, str] = {
@@ -71,8 +95,9 @@ def get_google_maps_search_url(destination_name: str, region: str = "") -> str:
 def get_maptiler_tile_url() -> str:
     key = os.getenv("MAPTILER_API_KEY", "")
     if key:
-        return f"https://api.maptiler.com/maps/streets/{{z}}/{{x}}/{{y}}.png?key={key}"
-    return "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        return f"https://api.maptiler.com/maps/streets-v2/{{z}}/{{x}}/{{y}}.png?key={key}"
+    # Better fallback with higher resolution tiles
+    return "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
 
 def get_coordinates(region: str) -> Optional[Tuple[float, float]]:
@@ -287,11 +312,15 @@ def generate_itinerary(destination: Dict[str, Any], days: int, budget: Optional[
     if "total" not in estimated_budget:
         estimated_budget["total"] = sum(v for k, v in estimated_budget.items() if isinstance(v, (int, float)))
 
-    map_embed_url = get_google_maps_embed_url(destination.get("name", ""), region)
-    map_search_url = get_google_maps_search_url(destination.get("name", ""), region)
+    dest_name = destination.get("name", "")
+    map_embed_url = get_google_maps_embed_url(dest_name, region)
+    map_search_url = get_google_maps_search_url(dest_name, region)
     map_tiler_url = get_maptiler_tile_url()
 
     advisories = get_weather_advisories(live_weather, destination)
+
+    # Use exact destination coordinates if available, otherwise fallback to region
+    coords = DESTINATION_COORDINATES.get(dest_name) or get_coordinates(region) or (30.3753, 69.3451)
 
     return {
         "destination": destination,
@@ -307,8 +336,8 @@ def generate_itinerary(destination: Dict[str, Any], days: int, budget: Optional[
             "search_url": map_search_url,
             "tile_url": map_tiler_url,
             "center": {
-                "lat": get_coordinates(region)[0] if get_coordinates(region) else 30.3753,
-                "lng": get_coordinates(region)[1] if get_coordinates(region) else 69.3451,
+                "lat": coords[0],
+                "lng": coords[1],
             },
         },
         "generated_at": datetime.utcnow().isoformat() + "Z",

@@ -42,8 +42,15 @@ jwt = JWTManager(app)
 recommendation_engine = RecommendationEngine()
 query_parser = QueryParser()
 
-# Initialize MongoDB persistence
-MONGO_DB = build_mongodb_persistence()
+# Initialize MongoDB persistence (fallback to JSON files if unavailable)
+try:
+    MONGO_DB = build_mongodb_persistence()
+except Exception as exc:
+    MONGO_DB = None
+    print(
+        "[WARN] MongoDB unavailable; running with JSON file storage only. "
+        f"Reason: {exc}"
+    )
 
 # Data collection names in MongoDB
 DESTINATIONS_COLLECTION = "destinations"
@@ -59,6 +66,9 @@ COST_RATES_FILE = os.path.join(DATA_DIR, 'cost_rates.json')
 # Seed MongoDB from JSON files if collections are empty
 def seed_mongodb():
     """Load initial data from JSON files into MongoDB if collections are empty."""
+    if MONGO_DB is None:
+        print("[INFO] Skipping MongoDB seeding (MongoDB not available).")
+        return
     for filepath, collection_name in [
         (DESTINATIONS_FILE, DESTINATIONS_COLLECTION),
         (USERS_FILE, USERS_COLLECTION),
@@ -84,9 +94,10 @@ def load_json(collection_name):
     Args:
         collection_name: Name of MongoDB collection to load from
     """
-    data = MONGO_DB.load_json(collection_name, collection_name)
-    if data is not None:
-        return data
+    if MONGO_DB is not None:
+        data = MONGO_DB.load_json(collection_name, collection_name)
+        if data is not None:
+            return data
     
     # Fallback to file if collection is empty
     filepath_map = {
@@ -111,9 +122,10 @@ def save_json(collection_name, data):
         collection_name: Name of MongoDB collection to save to
         data: Data to save
     """
-    success = MONGO_DB.save_json(collection_name, collection_name, data)
-    if not success:
-        print(f"Warning: Failed to save to MongoDB collection {collection_name}")
+    if MONGO_DB is not None:
+        success = MONGO_DB.save_json(collection_name, collection_name, data)
+        if not success:
+            print(f"Warning: Failed to save to MongoDB collection {collection_name}")
     
     # Also save to file for backup
     filepath_map = {
@@ -371,17 +383,28 @@ def generate_itinerary_route():
     """Generate a day-by-day trip plan using NLP, recommendation logic, and live weather."""
     data = request.json or {}
     query = data.get('query', '')
+    
+    parsed = query_parser.parse(query) if query else {}
+    
     destination_name = data.get('destination')
-    days = int(data.get('days') or 3)
-    budget = data.get('budget')
+    if not destination_name and parsed.get('destination'):
+        destination_name = parsed['destination']
+
+    # Use explicitly provided days/budget, fallback to NLP parsed values, then defaults
+    try:
+        days = int(data.get('days')) if data.get('days') else (parsed.get('days') or 3)
+    except Exception:
+        days = parsed.get('days') or 3
+
+    try:
+        budget = float(data.get('budget')) if data.get('budget') else parsed.get('budget')
+    except Exception:
+        budget = parsed.get('budget')
+
     preferences = data.get('preferences') or {}
 
     destinations = load_json(DESTINATIONS_COLLECTION)
     cost_rates = load_json(COST_RATES_COLLECTION)
-
-    parsed = query_parser.parse(query) if query else {}
-    if not destination_name and parsed.get('destination'):
-        destination_name = parsed['destination']
 
     candidates = destinations
     if parsed.get('budget'):
@@ -391,9 +414,20 @@ def generate_itinerary_route():
     if parsed.get('type'):
         candidates = [d for d in candidates if d.get('type', '').lower() == parsed['type'].lower()]
 
+    import difflib
+
     destination = None
     if destination_name:
+        # Exact match first
         destination = next((d for d in destinations if d['name'].lower() == destination_name.lower()), None)
+        # Fuzzy match fallback
+        if not destination:
+            dest_names = [d['name'] for d in destinations]
+            matches = difflib.get_close_matches(destination_name, dest_names, n=1, cutoff=0.6)
+            if matches:
+                matched_name = matches[0]
+                destination = next((d for d in destinations if d['name'] == matched_name), None)
+
     if not destination and candidates:
         ranked = recommendation_engine.get_recommendations(candidates, preferences=preferences, num_recommendations=1)
         destination = ranked[0] if ranked else candidates[0]
@@ -626,14 +660,6 @@ def save_trip():
     }
     
     users[user_index]['saved_trips'].append(trip)
-    users[user_index].setdefault('history', []).append({
-        'id': len(users[user_index]['history']) + 1,
-        'destination': data.get('destination'),
-        'days': data.get('days'),
-        'budget_estimate': data.get('budget_estimate'),
-        'saved_at': data.get('saved_at'),
-        'action': 'saved'
-    })
     save_json(USERS_COLLECTION, users)
     
     return jsonify({

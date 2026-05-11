@@ -9,6 +9,7 @@ import json
 from typing import Any, Optional
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
+import certifi
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -33,13 +34,23 @@ class MongoDBPersistence:
     def _connect(self):
         """Establish connection to MongoDB."""
         try:
-            self.client = MongoClient(self.uri, serverSelectionTimeoutMS=5000)
+            ca_file = os.getenv("MONGO_TLS_CA_FILE", certifi.where())
+            self.client = MongoClient(
+                self.uri,
+                serverSelectionTimeoutMS=5000,
+                tlsCAFile=ca_file,
+            )
             # Verify connection
             self.client.admin.command('ping')
             self.db = self.client[self.db_name]
             print(f"[OK] Connected to MongoDB: {self.db_name}")
         except (ConnectionFailure, ServerSelectionTimeoutError) as e:
-            print(f"[ERROR] Failed to connect to MongoDB: {e}")
+            print(
+                "[ERROR] Failed to connect to MongoDB: "
+                f"{e}\n"
+                "[HINT] If using MongoDB Atlas, ensure TLS certificates are "
+                "available and your system clock is correct."
+            )
             raise
     
     def close(self):

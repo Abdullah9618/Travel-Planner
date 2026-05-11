@@ -70,6 +70,12 @@ class RecommendationEngine:
         scored_destinations = []
         
         for dest in destinations:
+            # Strict filtering: exclude destinations that exceed maximum budget
+            if preferences and 'budget_range' in preferences:
+                budget_max = preferences['budget_range'].get('max', float('inf'))
+                if dest.get('cost', 0) > budget_max:
+                    continue # Do not recommend over budget
+
             score = 0.0
             
             # Content-based filtering score

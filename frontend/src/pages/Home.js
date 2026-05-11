@@ -69,7 +69,7 @@ const Home = () => {
           
           {!isAuthenticated && (
             <p className="guest-notice">
-              🎉 Browse as guest or <Link to="/register">create an account</Link> to save your trips
+               Browse as guest or <Link to="/register">create an account</Link> to save your trips
             </p>
           )}
         </div>

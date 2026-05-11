@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaStar, FaMapMarkerAlt, FaCalendarAlt, FaShieldAlt, FaHeart, FaRegHeart } from 'react-icons/fa';
 import '../styles/DestinationCard.css';
 
@@ -10,6 +10,7 @@ const DestinationCard = ({
   isSaved = false,
   compact = false 
 }) => {
+  const navigate = useNavigate();
   const {
     id,
     name,
@@ -53,8 +54,19 @@ const DestinationCard = ({
     }).format(amount);
   };
 
+  const handleCardClick = (e) => {
+    // Only navigate if the click isn't on the save button or its icon
+    if (!e.target.closest('.save-btn') && !e.target.closest('.view-btn')) {
+      navigate(`/destination/${encodeURIComponent(name)}`);
+    }
+  };
+
   return (
-    <div className={`destination-card ${compact ? 'compact' : ''}`}>
+    <div 
+      className={`destination-card ${compact ? 'compact' : ''}`} 
+      onClick={handleCardClick}
+      style={{ cursor: 'pointer' }}
+    >
       <div className="card-image-container">
         <img 
           src={imageUrl} 
@@ -137,7 +149,7 @@ const DestinationCard = ({
             <span className="price-label">Starting from</span>
             <span className="price-value">{formatCurrency(cost)}</span>
           </div>
-          <Link to={`/destination/${id || name}`} className="view-btn">
+          <Link to={`/destination/${encodeURIComponent(name)}`} className="view-btn">
             View Details
           </Link>
         </div>

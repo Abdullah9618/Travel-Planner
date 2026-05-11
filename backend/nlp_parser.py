@@ -158,15 +158,18 @@ class QueryParser:
         place_regions = {
             'hunza': 'Gilgit Baltistan',
             'skardu': 'Gilgit Baltistan',
+            'sakardu': 'Gilgit Baltistan',
             'naran': 'KPK',
             'kaghan': 'KPK',
             'swat': 'KPK',
             'murree': 'Punjab',
             'lahore': 'Punjab',
+            'islamabad': 'Islamabad Capital Territory',
             'karachi': 'Sindh',
             'gwadar': 'Balochistan',
             'quetta': 'Balochistan',
             'neelum': 'AJK',
+            'neelam': 'AJK',
             'muzaffarabad': 'AJK'
         }
         
@@ -200,17 +203,38 @@ class QueryParser:
     
     def _extract_destination(self, query: str) -> Optional[str]:
         """Extract specific destination name if mentioned"""
-        destinations = [
-            'hunza', 'skardu', 'fairy meadows', 'naran', 'kaghan',
-            'swat', 'murree', 'nathia gali', 'lahore', 'karachi',
-            'gwadar', 'quetta', 'neelum valley', 'malam jabba',
-            'taxila', 'mohenjo daro', 'khunjerab', 'deosai',
-            'saif ul malook', 'attabad lake', 'shangrila', 'chitral'
-        ]
+        dest_map = {
+            'hunza': 'Hunza',
+            'skardu': 'Skardu',
+            'sakardu': 'Skardu',  # Common misspelling
+            'fairy meadows': 'Fairy Meadows',
+            'naran': 'Naran',
+            'kaghan': 'Kaghan',
+            'swat': 'Swat',
+            'murree': 'Murree',
+            'nathia gali': 'Nathia Gali',
+            'lahore': 'Lahore',
+            'karachi': 'Karachi',
+            'gwadar': 'Gwadar',
+            'quetta': 'Quetta',
+            'neelum valley': 'Neelum Valley',
+            'neelam': 'Neelum Valley',
+            'malam jabba': 'Malam Jabba',
+            'taxila': 'Taxila',
+            'mohenjo daro': 'Mohenjo Daro',
+            'khunjerab': 'Khunjerab',
+            'deosai': 'Deosai',
+            'saif ul malook': 'Saif Ul Malook',
+            'attabad lake': 'Attabad Lake',
+            'shangrila': 'Shangrila',
+            'chitral': 'Chitral',
+            'islamabad': 'Islamabad',
+            'peshawar': 'Peshawar'
+        }
         
-        for dest in destinations:
-            if dest in query:
-                return dest.title()
+        for key, actual_name in dest_map.items():
+            if key in query:
+                return actual_name
         
         return None
 

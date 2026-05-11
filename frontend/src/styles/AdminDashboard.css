@@ -410,9 +410,10 @@
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
 }
 
-.form-actions .cancel-btn {
+.form-actions .admin-cancel-btn {
   padding: 0.75rem 1.5rem;
   background: var(--bg-secondary);
   color: var(--text-secondary);
@@ -422,11 +423,11 @@
   transition: var(--transition);
 }
 
-.form-actions .cancel-btn:hover {
+.form-actions .admin-cancel-btn:hover {
   background: var(--border-color);
 }
 
-.form-actions .save-btn {
+.form-actions .admin-save-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -439,7 +440,7 @@
   transition: var(--transition);
 }
 
-.form-actions .save-btn:hover {
+.form-actions .admin-save-btn:hover {
   background: var(--primary-dark);
 }
 
@@ -525,6 +526,15 @@
 @media (max-width: 768px) {
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    justify-content: stretch;
+  }
+
+  .form-actions .admin-cancel-btn,
+  .form-actions .admin-save-btn {
+    flex: 1 1 100%;
   }
 
   .bar-item {
