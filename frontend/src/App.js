@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import SharedTrip from './pages/SharedTrip';
 import Destination from './pages/Destination';
 import SearchResults from './pages/SearchResults';
 import AdminDashboard from './pages/AdminDashboard';
@@ -14,6 +15,7 @@ import ItineraryPlanner from './pages/ItineraryPlanner';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles/App.css';
 import './styles/ItineraryPlanner.css';
+import './styles/SharedTrip.css';
 
 function App() {
   return (
@@ -27,6 +29,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/planner" element={<ItineraryPlanner />} />
+          <Route path="/shared-trip/:token" element={<SharedTrip />} />
           <Route path="/destination/:id" element={<Destination />} />
           <Route 
             path="/profile" 

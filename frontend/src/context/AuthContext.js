@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import api, { tripService } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -144,6 +144,50 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateSavedTrip = async (tripId, tripData) => {
+    try {
+      const response = await tripService.updateSavedTrip(tripId, tripData);
+      if (response.data?.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        setUser(response.data.user);
+      }
+      return { success: true, trip: response.data?.trip };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Failed to update trip'
+      };
+    }
+  };
+
+  const deleteSavedTrip = async (tripId) => {
+    try {
+      const response = await tripService.deleteSavedTrip(tripId);
+      if (response.data?.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        setUser(response.data.user);
+      }
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Failed to delete trip'
+      };
+    }
+  };
+
+  const shareSavedTrip = async (tripId) => {
+    try {
+      const response = await tripService.shareSavedTrip(tripId);
+      return { success: true, shareUrl: response.data?.share_url, trip: response.data?.trip };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Failed to share trip'
+      };
+    }
+  };
+
   const value = {
     user,
     token,
@@ -155,7 +199,10 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateProfile,
-    saveTrip
+    saveTrip,
+    updateSavedTrip,
+    deleteSavedTrip,
+    shareSavedTrip
   };
 
   return (

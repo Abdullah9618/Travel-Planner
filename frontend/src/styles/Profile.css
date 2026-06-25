@@ -265,6 +265,51 @@
   font-size: 0.9rem;
 }
 
+.trip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.trip-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.trip-action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.trip-action-btn.share {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.trip-action-btn.delete {
+  background: #fee2e2;
+  color: var(--danger-color);
+}
+
+.trip-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.trip-modal {
+  max-width: 720px;
+}
+
 .trip-cost {
   color: var(--primary-color);
   font-weight: 600;
@@ -310,5 +355,13 @@
 
   .budget-range {
     flex-direction: column;
+  }
+
+  .trip-actions {
+    flex-direction: column;
+  }
+
+  .trip-action-btn {
+    justify-content: center;
   }
 }

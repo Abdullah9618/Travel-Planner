@@ -1,366 +1,319 @@
-# Travel Planner Pakistan - AI-Powered Trip Planning
+# Travel Planner Pakistan
 
-A comprehensive web application for planning trips in Pakistan with AI-powered destination recommendations, budget estimation, and personalized travel suggestions.
+An AI-assisted travel planning web app for discovering destinations in Pakistan, generating itineraries, estimating budgets, and saving shareable trip plans.
 
-## 🌟 Features
+## What this project does
 
-### Home Page
-- **Intelligent Search Bar**: Natural language queries like "Plan a 3-day trip to northern Pakistan under 25,000 PKR"
-- **NLP Query Parsing**: Automatically extracts destination, days, budget, and travel type
-- **Recommended Destinations**: Dynamic cards with personalized recommendations
-- **Guest User Access**: Browse and use the app without registration
-- **Real-time Travel Suggestions**: 
-  - "Top Adventure Spots under 20,000 PKR"
-  - "Best Weekend Destinations Near You"
-  - "Highest Rated Destinations"
+This app helps users:
 
-### User Registration & Profile Management
-- Email-based registration and login
-- Profile page with travel preferences:
-  - Budget range (min/max)
-  - Travel style (Adventure, Relaxation, Family, Cultural, etc.)
-  - Preferred trip duration
-  - Weather preferences
-  - Preferred activities
+- search destinations using natural language
+- get personalized recommendations
+- generate day-by-day itineraries
+- estimate trip budgets
+- view live weather highlights and travel advisories
+- save, edit, delete, and share travel plans
+- manage destinations and analytics from an admin dashboard
 
-### Destination Recommendation System
-- **Content-Based Filtering**: Matches destinations to user preferences
-- **Collaborative Filtering**: Recommends based on similar users' behavior
-- **Cold-Start Handling**: Popular destinations for new users
-- 20+ destinations with rich data including:
-  - Type, Region, Cost
-  - Weather, Best Season
-  - Activities, Safety Rating
-  - User Ratings, Images
+## Core features
 
-### Budget Estimation & Cost Optimization
-- Detailed cost breakdown:
-  - Hotel (per night)
-  - Travel/Transport
-  - Meals (per day)
-  - Activities
-- Region-based pricing
-- Visual budget breakdown with charts
-- Budget optimization tips
+### Home page
 
-### Admin Dashboard
-- **Statistics Overview**: Total destinations, users, ratings
-- **Destination Management**: Add, edit, delete destinations
-- **Cost Rates Management**: Update regional pricing
-- **Visual Analytics**: Charts for destinations by type/region
+- natural-language search bar for queries like `Plan a 3-day trip to northern Pakistan under 25,000 PKR`
+- AI-powered featured and trending destination cards
+- live weather highlights and travel advisories
+- dynamic travel suggestion chips
+- personalized greeting for logged-in users
+- quick access to the itinerary planner and saved trips
 
-## 🛠️ Technology Stack
+### Authentication and profiles
+
+- email/password registration and login
+- Google sign-in support
+- profile management for:
+  - budget range
+  - travel style
+  - preferred duration
+  - weather preference
+  - preferred activities
+- saved trips and travel history
+
+### Recommendation engine
+
+- spaCy-based NLP parsing for travel queries
+- sklearn TF-IDF and cosine similarity when available
+- pure-Python fallback for resilient local development
+- content-based ranking
+- travel-history-aware similarity scoring
+- cold-start popularity fallback for new users
+
+### Itinerary planner
+
+- generates day-by-day trip plans
+- includes live weather context
+- includes budget breakdowns
+- includes recommended attractions and restaurants when available
+- provides route summary and Google Maps link
+- lets users edit daily plans before saving
+
+### Budget and cost planning
+
+- hotel, travel, meals, and activities cost breakdown
+- budget-aware recommendation filtering
+- over-budget alternative suggestions
+
+### Weather and events
+
+- live OpenWeather lookup when API key and coordinates are available
+- curated fallback weather data for development/offline use
+- weather advisories based on conditions
+- fallback local event suggestions when live event API is unavailable
+
+### Maps and navigation
+
+- interactive Leaflet map in the itinerary planner
+- Google Maps search and embed links
+- destination route summary with estimated travel distance/time
+
+### Destination and shared trip pages
+
+- destination detail page with similar destinations
+- live weather on destination detail pages
+- save trip from a destination page
+- public shareable trip pages
+
+### Admin dashboard
+
+- manage destination records
+- manage cost rates
+- inspect activity analytics
+- review and moderate feedback
+- view and retrain/toggle AI models
+
+## Technology stack
 
 ### Frontend
-- **React.js 18** - UI Framework
-- **React Router 6** - Navigation
-- **React Icons** - Icon library
-- **React Toastify** - Notifications
-- **Axios** - HTTP client
-- **CSS3** - Custom styling (no frameworks)
+
+- React 18
+- React Router
+- React Icons
+- React Toastify
+- Axios
+- React Leaflet
+- plain CSS
 
 ### Backend
-- **Python 3.10+** - Server language
-- **Flask** - Web framework
-- **Flask-CORS** - Cross-origin support
-- **Flask-JWT-Extended** - JWT authentication
-- **Werkzeug** - Password hashing
-- **SQLAlchemy** - Database-backed persistence layer (MySQL/SQLite)
-- **Google Auth** - Google OAuth token verification
 
-### AI/ML
-- **NumPy** - Numerical computing
-- **Custom NLP Parser** - Query understanding
-- **Custom Recommendation Engine**:
-  - Content-based filtering
-  - Collaborative filtering
-  - Similarity calculations
+- Flask
+- Flask-CORS
+- Flask-JWT-Extended
+- Google OAuth token verification
+- MongoDB persistence layer with JSON fallback
+- Python-based itinerary and weather integration helpers
 
-### Database
-- **MySQL / SQLite via SQLAlchemy** - Production-ready persistence
-- JSON files remain as seed/backup data sources
+### AI and NLP
 
-## 📁 Project Structure
+- spaCy for query parsing and entity extraction
+- pure-Python TF-IDF destination recommender
+- cosine similarity scoring
+- travel-history-aware matching
 
-```
+### Data storage
+
+- JSON seed/backup files in `backend/data/`
+- MongoDB-backed persistence when available
+
+## Project structure
+
+```text
 FYP/
 ├── backend/
-│   ├── app.py                    # Main Flask application
-│   ├── nlp_parser.py             # NLP query parser
-│   ├── recommendation_engine.py  # ML recommendation system
-│   ├── requirements.txt          # Python dependencies
+│   ├── app.py
+│   ├── integration_services.py
+│   ├── mongodb_persistence.py
+│   ├── nlp_parser.py
+│   ├── recommendation_engine.py
+│   ├── persistence.py
+│   ├── requirements.txt
 │   └── data/
-│       ├── destinations.json     # Destination data
-│       ├── users.json            # User data
-│       └── cost_rates.json       # Regional pricing
-│
+│       ├── analytics.json
+│       ├── cost_rates.json
+│       ├── destinations.json
+│       ├── models.json
+│       └── users.json
 └── frontend/
     ├── package.json
-    ├── public/
-    │   └── index.html
     └── src/
-        ├── index.js
         ├── App.js
-        ├── context/
-        │   └── AuthContext.js    # Authentication state
-        ├── services/
-        │   └── api.js            # API service
+        ├── index.js
         ├── components/
-        │   ├── Navbar.js
-        │   ├── Footer.js
-        │   ├── SearchBar.js
-        │   ├── DestinationCard.js
-        │   ├── BudgetTable.js
-        │   └── ProtectedRoute.js
+        ├── context/
         ├── pages/
-        │   ├── Home.js
-        │   ├── Login.js
-        │   ├── Register.js
-        │   ├── Profile.js
-        │   ├── SearchResults.js
-        │   ├── Destination.js
-        │   └── AdminDashboard.js
+        ├── services/
         └── styles/
-            ├── index.css
-            ├── App.css
-            ├── Navbar.css
-            ├── Footer.css
-            ├── SearchBar.css
-            ├── DestinationCard.css
-            ├── BudgetTable.css
-            ├── Home.css
-            ├── Auth.css
-            ├── Profile.css
-            ├── SearchResults.css
-            ├── Destination.css
-            └── AdminDashboard.css
 ```
 
-## 🚀 Getting Started
+## Key pages
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- npm or yarn
+- `/` — Home page
+- `/login` — Login page
+- `/register` — Registration page
+- `/search` — Search results page
+- `/planner` — AI itinerary planner
+- `/destination/:id` — Destination detail page
+- `/profile` — User profile and saved trips
+- `/shared-trip/:token` — Public shared itinerary view
+- `/admin/*` — Admin dashboard
 
-### Backend Setup
+## API overview
 
-1. Navigate to the backend directory:
-```bash
-cd backend
-```
+### Public endpoints
 
-2. Create a virtual environment:
-```bash
-python -m venv venv
-```
-
-3. Activate the virtual environment:
-```bash
-# Windows
-venv\Scripts\activate
-
-# macOS/Linux
-source venv/bin/activate
-```
-
-4. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-5. Run the Flask server:
-```bash
-python app.py
-```
-
-The backend will run on `http://localhost:5000`
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-```bash
-cd frontend
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm start
-```
-
-The frontend will run on `http://localhost:3000`
-
-## 🔐 Demo Credentials
-
-### Admin Account
-- **Email**: admin@travelplanner.com
-- **Password**: admin123
-
-### Guest Access
-- Browse and search without login
-- Register to save trips and preferences
-
-## 📡 API Endpoints
-
-### Public Endpoints
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/search` | Search with natural language query |
-| GET | `/api/destinations` | Get all destinations |
-| GET | `/api/destinations/:id` | Get single destination |
-| GET/POST | `/api/recommendations` | Get recommendations |
-| GET | `/api/travel-suggestions` | Get travel suggestions |
-| GET | `/api/home/insights` | Weather highlights + advisories |
-| GET | `/api/weather/highlights` | Live regional weather snapshots |
-| GET | `/api/explore/places` | TravelAdvisor places search |
-| POST | `/api/itinerary/generate` | Generate AI itinerary |
-| POST | `/api/budget/estimate` | Estimate trip budget |
+|---|---|---|
+| POST | `/api/search` | Parse a natural-language travel query |
+| GET | `/api/destinations` | List destinations |
+| GET | `/api/destinations/:id` | Get one destination |
+| GET/POST | `/api/recommendations` | Get recommended destinations |
+| GET | `/api/travel-suggestions` | Homepage suggestion cards |
+| GET | `/api/home/insights` | Featured/trending/weather/advisories |
+| GET | `/api/weather/highlights` | Live weather snapshots |
+| GET | `/api/explore/places` | Attraction/restaurant suggestions |
+| POST | `/api/itinerary/generate` | Generate a full itinerary |
+| POST | `/api/budget/estimate` | Estimate budget |
+| POST | `/api/feedback` | Submit feedback |
+| GET | `/api/shared-trip/:token` | Load a shared trip |
 
-### Auth Endpoints
+### Authentication endpoints
+
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login user |
-| POST | `/api/auth/google` | Login/register with Google ID token |
-| GET | `/api/auth/profile` | Get user profile |
+|---|---|---|
+| POST | `/api/auth/register` | Create an account |
+| POST | `/api/auth/login` | Sign in |
+| POST | `/api/auth/google` | Google sign-in |
+| GET | `/api/auth/profile` | Load profile |
 | PUT | `/api/auth/profile` | Update profile |
-| POST | `/api/auth/save-trip` | Save trip to profile |
+| POST | `/api/auth/save-trip` | Save itinerary to profile |
+| GET | `/api/auth/history` | View travel history |
 
-## 🔑 Environment Variables
+### Saved-trip endpoints
 
-### Backend (`backend/.env`)
+| Method | Endpoint | Description |
+|---|---|---|
+| PUT | `/api/auth/saved-trips/:id` | Update a saved trip |
+| DELETE | `/api/auth/saved-trips/:id` | Delete a saved trip |
+| POST | `/api/auth/saved-trips/:id/share` | Generate share link |
+
+### Admin endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/admin/destinations` | List all destinations |
+| POST | `/api/admin/destinations` | Add destination |
+| PUT | `/api/admin/destinations/:id` | Update destination |
+| DELETE | `/api/admin/destinations/:id` | Delete destination |
+| GET | `/api/admin/stats` | Dashboard stats |
+| GET | `/api/admin/activity` | Activity summary |
+| GET | `/api/admin/feedback` | Feedback list |
+| PATCH | `/api/admin/feedback/:id` | Update feedback status |
+| GET | `/api/admin/models` | View model list |
+| PATCH | `/api/admin/models/:id` | Retrain/toggle model |
+| GET | `/api/admin/cost-rates` | View cost rates |
+| PUT | `/api/admin/cost-rates` | Update cost rates |
+
+## Environment variables
+
+### Backend `backend/.env`
+
 - `JWT_SECRET_KEY`
-- `DATABASE_URL` (optional, e.g. `mysql+pymysql://user:pass@host:3306/dbname`)
-- `OPENWEATHER_API_KEY`
-- `MAPTILER_API_KEY`
-- `TRAVELADVISOR_API_KEY`
-- `GOOGLE_CLIENT_ID` (for Google OAuth)
+- `DATABASE_URL` (optional)
+- `OPENWEATHER_API_KEY` (optional, for live weather)
+- `MAPTILER_API_KEY` (optional, for map tiles)
+- `TRAVELADVISOR_API_KEY` (optional, for places search; RapidAPI key if available)
+- `GOOGLE_CLIENT_ID` (optional, for Google sign-in)
 
-### Frontend (`frontend/.env`)
+TripAdvisor place suggestions use this order:
+
+1. TripAdvisor Content API when the configured provider responds
+2. TripAdvisor public page parsing when available
+3. OpenStreetMap live lookup via Nominatim/Overpass
+4. curated fallback places as a last resort
+
+### Frontend `frontend/.env`
+
 - `REACT_APP_API_URL`
 - `REACT_APP_GOOGLE_CLIENT_ID`
 - `REACT_APP_MAPTILER_API_KEY`
 
-## 🐳 Docker Deployment (Full Stack)
+## Getting started
 
-Run from project root:
+### Backend
+
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+```
+
+The backend runs on `http://localhost:5000`.
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+The frontend runs on `http://localhost:3000`.
+
+### Smoke tests
+
+Run the provided validation scripts from the project root:
+
+```bash
+python test_tripadvisor.py
+python test_recommendation_engine.py
+```
+
+### AI/ML note
+
+The destination recommender uses sklearn TF-IDF and cosine similarity when available, with a pure-Python fallback to keep development resilient.
+
+## Docker
+
+Run the full stack from the project root:
 
 ```bash
 docker compose up --build
 ```
 
-Services:
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:5000`
-- MySQL: `localhost:3306`
+## Demo credentials
 
-## 🚢 Single-Server Docker Deploy
+### Admin
 
-Use this when you want one Docker-based deployment that other people can access over the internet.
+- email: `admin@travelplanner.com`
+- password: `admin123`
 
-### What you need
-- A server or VPS with Docker and Docker Compose installed
-- Your API keys set as environment variables on the server
-- A public IP or domain name
+## Notes for the report
 
-### Steps
-1. Clone the repository on the server.
-2. Create a root `.env` file with your production values:
-  - `DATABASE_URL`
-  - `JWT_SECRET_KEY`
-  - `OPENWEATHER_API_KEY`
-  - `MAPTILER_API_KEY`
-  - `TRAVELADVISOR_API_KEY`
-  - `GOOGLE_CLIENT_ID`
-3. Run:
-  ```bash
-  docker compose up -d --build
-  ```
-4. Open the exposed ports:
-  - `3000` for the frontend
-  - `5000` for the backend
+- The NLP layer is spaCy-based, not regex-only.
+- The recommender uses a fitted TF-IDF model with cosine similarity.
+- Live APIs are used when configured, but the app still works with fallback data.
+- MongoDB is supported, with JSON files used as seed/backup storage.
 
-### Notes
-- The current `docker-compose.yml` already supports environment variables, so you do **not** need to hardcode secrets.
-- For a cleaner public URL, place an Nginx reverse proxy or a managed domain in front of the containers.
-- If you want true one-domain access, I can convert this into a single Nginx-fronted Docker setup next.
+## Future improvements
 
-### Admin Endpoints (Protected)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/admin/destinations` | Get all destinations |
-| POST | `/api/admin/destinations` | Add new destination |
-| PUT | `/api/admin/destinations/:id` | Update destination |
-| DELETE | `/api/admin/destinations/:id` | Delete destination |
-| GET | `/api/admin/stats` | Get dashboard stats |
-| GET | `/api/admin/cost-rates` | Get cost rates |
-| PUT | `/api/admin/cost-rates` | Update cost rates |
+- deeper real-time API coverage
+- stronger event discovery integration
+- more advanced model training with user interaction data
+- multi-language support
+- mobile app version
 
-## 🧠 ML Recommendation Algorithm
+## License
 
-### Content-Based Filtering
-- Calculates similarity between user preferences and destination features
-- Features considered:
-  - Budget matching (20% weight)
-  - Travel style (25% weight)
-  - Weather preference (10% weight)
-  - Activities overlap (15% weight)
-  - Ratings (15% weight)
-
-### Collaborative Filtering
-- Finds similar destinations based on user's travel history
-- Uses destination similarity metrics:
-  - Type similarity
-  - Region matching
-  - Weather similarity
-  - Activity overlap
-  - Cost similarity
-
-### Cold-Start Handling
-- New users receive popular destinations
-- Scoring based on user ratings and safety ratings
-
-## 🎨 Sample Destinations
-
-The app includes 20 pre-configured destinations:
-
-| Destination | Type | Region | Cost (PKR) |
-|-------------|------|--------|------------|
-| Hunza Valley | Adventure | Gilgit Baltistan | 25,000 |
-| Skardu | Adventure | Gilgit Baltistan | 35,000 |
-| Murree | Family | Punjab | 15,000 |
-| Swat Valley | Cultural | KPK | 20,000 |
-| Gwadar Beach | Relaxation | Balochistan | 18,000 |
-| Lahore | Cultural | Punjab | 12,000 |
-| Fairy Meadows | Adventure | Gilgit Baltistan | 28,000 |
-| Taxila | Historical | Punjab | 8,000 |
-| And more... | | | |
-
-## 🔮 Future Enhancements
-
-- [ ] Real API integrations (Google Places, Weather API)
-- [ ] MongoDB/PostgreSQL database
-- [ ] Real-time chat support
-- [ ] Trip itinerary generation
-- [ ] Social sharing features
-- [ ] Review and rating system
-- [ ] Mobile app (React Native)
-- [ ] Multi-language support
-- [ ] Payment integration
-
-## 📝 License
-
-This project is created for educational purposes as part of a Final Year Project (FYP).
-
-## 👥 Contributors
-
-- Student: [Your Name]
-- Supervisor: [Supervisor Name]
+Educational project for a final year project.
 
 ---
 

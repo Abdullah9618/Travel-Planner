@@ -80,11 +80,112 @@
   gap: 0.75rem;
 }
 
+.day-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+
 .day-card {
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  padding: 0.75rem;
+  overflow: hidden;
   background: #fafafa;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.day-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.day-card-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 0.9rem;
+  border: 0;
+  background: linear-gradient(135deg, #fff, #f8fafc);
+  cursor: pointer;
+  text-align: left;
+}
+
+.day-card-header strong,
+.day-card-header span {
+  display: block;
+}
+
+.day-card-header span {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin-top: 0.15rem;
+}
+
+.day-card-toggle {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--primary-color);
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.day-card-body {
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.day-card-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.day-card-body label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.day-card-body input,
+.day-card-body textarea {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+  background: #fff;
+}
+
+.day-card-body textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.day-card-preview {
+  padding: 0 0.9rem 0.9rem;
+  color: var(--text-secondary);
+  display: grid;
+  gap: 0.45rem;
+}
+
+.day-card-preview p {
+  margin: 0;
+}
+
+.planner-btn.secondary {
+  background: #e5eefc;
+  color: var(--primary-color);
+}
+
+.planner-btn.secondary:hover {
+  filter: brightness(0.97);
 }
 
 .budget-status {

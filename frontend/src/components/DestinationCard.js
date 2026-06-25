@@ -12,7 +12,6 @@ const DestinationCard = ({
 }) => {
   const navigate = useNavigate();
   const {
-    id,
     name,
     type,
     region,

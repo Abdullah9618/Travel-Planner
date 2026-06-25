@@ -46,7 +46,9 @@ export const destinationService = {
   getWeatherHighlights: (region) => api.get('/weather/highlights', { params: region ? { region } : {} }),
   getPlaces: (query, category = 'attractions') =>
     api.get('/explore/places', { params: { query, category, limit: 5 } }),
-  generateItinerary: (payload) => api.post('/itinerary/generate', payload)
+  generateItinerary: (payload) => api.post('/itinerary/generate', payload),
+  submitFeedback: (payload) => api.post('/feedback', payload),
+  getSharedTrip: (shareToken) => api.get(`/shared-trip/${shareToken}`)
 };
 
 // Budget API calls
@@ -62,8 +64,19 @@ export const adminService = {
   updateDestination: (id, data) => api.put(`/admin/destinations/${id}`, data),
   deleteDestination: (id) => api.delete(`/admin/destinations/${id}`),
   getStats: () => api.get('/admin/stats'),
+  getActivityStats: () => api.get('/admin/activity'),
+  getFeedback: () => api.get('/admin/feedback'),
+  updateFeedback: (id, status) => api.patch(`/admin/feedback/${id}`, { status }),
+  getModels: () => api.get('/admin/models'),
+  updateModel: (id, data) => api.patch(`/admin/models/${id}`, data),
   getCostRates: () => api.get('/admin/cost-rates'),
   updateCostRates: (data) => api.put('/admin/cost-rates', data)
+};
+
+export const tripService = {
+  updateSavedTrip: (id, data) => api.put(`/auth/saved-trips/${id}`, data),
+  deleteSavedTrip: (id) => api.delete(`/auth/saved-trips/${id}`),
+  shareSavedTrip: (id) => api.post(`/auth/saved-trips/${id}/share`)
 };
 
 export default api;

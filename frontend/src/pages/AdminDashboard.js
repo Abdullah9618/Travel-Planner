@@ -602,66 +602,47 @@ const RegionsManagement = () => {
 
 // AI Models Management Component
 const AIModelsManagement = () => {
-  const [models, setModels] = useState([
-    { 
-      id: 1, 
-      name: 'Content-Based Filtering', 
-      version: '1.2.0',
-      status: 'active',
-      accuracy: 87,
-      lastTrained: '2024-01-15',
-      description: 'Recommends destinations based on activity preferences and user history'
-    },
-    { 
-      id: 2, 
-      name: 'Collaborative Filtering', 
-      version: '2.0.1',
-      status: 'active',
-      accuracy: 92,
-      lastTrained: '2024-01-20',
-      description: 'Uses user similarity patterns for recommendations'
-    },
-    { 
-      id: 3, 
-      name: 'NLP Query Parser', 
-      version: '1.5.0',
-      status: 'active',
-      accuracy: 95,
-      lastTrained: '2024-01-18',
-      description: 'Parses natural language queries for destination search'
-    },
-    { 
-      id: 4, 
-      name: 'Budget Optimizer', 
-      version: '1.0.0',
-      status: 'inactive',
-      accuracy: 78,
-      lastTrained: '2024-01-10',
-      description: 'Optimizes trip costs based on user budget constraints'
-    }
-  ]);
+  const [models, setModels] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [retraining, setRetraining] = useState(null);
 
-  const handleRetrain = (id) => {
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const response = await adminService.getModels();
+        setModels(response.data.models || []);
+      } catch (error) {
+        toast.error(error.response?.data?.error || 'Failed to load AI models');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModels();
+  }, []);
+
+  const handleRetrain = async (id) => {
     setRetraining(id);
-    setTimeout(() => {
-      setModels(models.map(m => 
-        m.id === id ? { 
-          ...m, 
-          lastTrained: new Date().toISOString().split('T')[0],
-          accuracy: Math.min(99, m.accuracy + Math.floor(Math.random() * 3))
-        } : m
-      ));
-      setRetraining(null);
+    try {
+      const response = await adminService.updateModel(id, { action: 'retrain' });
+      setModels(prev => prev.map(model => model.id === id ? response.data.model : model));
       toast.success('Model retrained successfully');
-    }, 2000);
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to retrain model');
+    } finally {
+      setRetraining(null);
+    }
   };
 
-  const toggleModelStatus = (id) => {
-    setModels(models.map(m => 
-      m.id === id ? { ...m, status: m.status === 'active' ? 'inactive' : 'active' } : m
-    ));
-    toast.success('Model status updated');
+  const toggleModelStatus = async (model) => {
+    const nextStatus = model.status === 'active' ? 'inactive' : 'active';
+    try {
+      const response = await adminService.updateModel(model.id, { status: nextStatus });
+      setModels(prev => prev.map(item => item.id === model.id ? response.data.model : item));
+      toast.success('Model status updated');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to update model status');
+    }
   };
 
   return (
@@ -670,47 +651,51 @@ const AIModelsManagement = () => {
         <h2><FaRobot /> AI Models Management</h2>
       </div>
 
-      <div className="models-grid">
-        {models.map((model) => (
-          <div key={model.id} className={`model-card ${model.status}`}>
-            <div className="model-header">
-              <h3>{model.name}</h3>
-              <span className={`status-badge ${model.status}`}>{model.status}</span>
-            </div>
-            <p className="model-description">{model.description}</p>
-            <div className="model-stats">
-              <div className="stat">
-                <span className="stat-label">Version</span>
-                <span className="stat-value">{model.version}</span>
+      {loading ? (
+        <div className="empty-state">Loading AI models…</div>
+      ) : (
+        <div className="models-grid">
+          {models.map((model) => (
+            <div key={model.id} className={`model-card ${model.status}`}>
+              <div className="model-header">
+                <h3>{model.name}</h3>
+                <span className={`status-badge ${model.status}`}>{model.status}</span>
               </div>
-              <div className="stat">
-                <span className="stat-label">Accuracy</span>
-                <span className="stat-value">{model.accuracy}%</span>
+              <p className="model-description">{model.description}</p>
+              <div className="model-stats">
+                <div className="stat">
+                  <span className="stat-label">Version</span>
+                  <span className="stat-value">{model.version}</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-label">Accuracy</span>
+                  <span className="stat-value">{model.accuracy}%</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-label">Last Trained</span>
+                  <span className="stat-value">{model.last_trained || model.lastTrained}</span>
+                </div>
               </div>
-              <div className="stat">
-                <span className="stat-label">Last Trained</span>
-                <span className="stat-value">{model.lastTrained}</span>
+              <div className="model-actions">
+                <button 
+                  className={`retrain-btn ${retraining === model.id ? 'loading' : ''}`}
+                  onClick={() => handleRetrain(model.id)}
+                  disabled={retraining === model.id}
+                >
+                  <FaSync className={retraining === model.id ? 'spinning' : ''} />
+                  {retraining === model.id ? 'Retraining...' : 'Retrain'}
+                </button>
+                <button 
+                  className={`toggle-btn ${model.status}`}
+                  onClick={() => toggleModelStatus(model)}
+                >
+                  {model.status === 'active' ? 'Disable' : 'Enable'}
+                </button>
               </div>
             </div>
-            <div className="model-actions">
-              <button 
-                className={`retrain-btn ${retraining === model.id ? 'loading' : ''}`}
-                onClick={() => handleRetrain(model.id)}
-                disabled={retraining === model.id}
-              >
-                <FaSync className={retraining === model.id ? 'spinning' : ''} />
-                {retraining === model.id ? 'Retraining...' : 'Retrain'}
-              </button>
-              <button 
-                className={`toggle-btn ${model.status}`}
-                onClick={() => toggleModelStatus(model.id)}
-              >
-                {model.status === 'active' ? 'Disable' : 'Enable'}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -819,32 +804,34 @@ const DatasetManagement = () => {
 
 // User Activity Statistics Component
 const UserActivityStats = () => {
-  const [activityData] = useState({
-    totalSearches: 1247,
-    totalBookmarks: 89,
-    averageSessionTime: '12 min',
-    popularSearches: [
-      { query: 'hunza in summer', count: 145 },
-      { query: 'beach destinations', count: 98 },
-      { query: 'budget trip under 50000', count: 87 },
-      { query: 'adventure in gilgit', count: 76 },
-      { query: 'family vacation', count: 65 }
-    ],
-    userActivity: [
-      { date: '2024-01-22', searches: 45, signups: 3 },
-      { date: '2024-01-21', searches: 67, signups: 5 },
-      { date: '2024-01-20', searches: 52, signups: 2 },
-      { date: '2024-01-19', searches: 78, signups: 4 },
-      { date: '2024-01-18', searches: 43, signups: 1 }
-    ],
-    topDestinations: [
-      { name: 'Hunza Valley', views: 456 },
-      { name: 'Skardu', views: 389 },
-      { name: 'Naran Kaghan', views: 312 },
-      { name: 'Swat Valley', views: 287 },
-      { name: 'Karachi Beach', views: 234 }
-    ]
+  const [activityData, setActivityData] = useState({
+    total_searches: 0,
+    total_itineraries: 0,
+    total_bookmarks: 0,
+    total_feedback: 0,
+    pending_feedback: 0,
+    average_session_time: 'Tracked via activity logs',
+    popular_searches: [],
+    top_destinations: [],
+    daily_activity: [],
+    recent_activity: []
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchActivity = async () => {
+      try {
+        const response = await adminService.getActivityStats();
+        setActivityData(response.data);
+      } catch (error) {
+        toast.error('Failed to load activity stats');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivity();
+  }, []);
 
   return (
     <div className="user-activity-stats">
@@ -852,97 +839,135 @@ const UserActivityStats = () => {
         <h2><FaUserClock /> User Activity Statistics</h2>
       </div>
 
-      <div className="activity-overview">
-        <div className="activity-card">
-          <FaChartBar className="activity-icon" />
-          <div className="activity-info">
-            <span className="activity-value">{activityData.totalSearches}</span>
-            <span className="activity-label">Total Searches</span>
+      {loading ? (
+        <div className="loading">Loading...</div>
+      ) : (
+        <>
+          <div className="activity-overview">
+            <div className="activity-card">
+              <FaChartBar className="activity-icon" />
+              <div className="activity-info">
+                <span className="activity-value">{activityData.total_searches}</span>
+                <span className="activity-label">Total Searches</span>
+              </div>
+            </div>
+            <div className="activity-card">
+              <FaUsers className="activity-icon" />
+              <div className="activity-info">
+                <span className="activity-value">{activityData.total_bookmarks}</span>
+                <span className="activity-label">Saved Trips</span>
+              </div>
+            </div>
+            <div className="activity-card">
+              <FaUserClock className="activity-icon" />
+              <div className="activity-info">
+                <span className="activity-value">{activityData.total_itineraries}</span>
+                <span className="activity-label">Itineraries</span>
+              </div>
+            </div>
+            <div className="activity-card">
+              <FaComments className="activity-icon" />
+              <div className="activity-info">
+                <span className="activity-value">{activityData.total_feedback}</span>
+                <span className="activity-label">Feedback</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="activity-card">
-          <FaUsers className="activity-icon" />
-          <div className="activity-info">
-            <span className="activity-value">{activityData.totalBookmarks}</span>
-            <span className="activity-label">Bookmarks</span>
-          </div>
-        </div>
-        <div className="activity-card">
-          <FaUserClock className="activity-icon" />
-          <div className="activity-info">
-            <span className="activity-value">{activityData.averageSessionTime}</span>
-            <span className="activity-label">Avg Session</span>
-          </div>
-        </div>
-      </div>
 
-      <div className="activity-details">
-        <div className="detail-card">
-          <h3>Popular Searches</h3>
-          <ul className="search-list">
-            {activityData.popularSearches.map((search, index) => (
-              <li key={index}>
-                <span className="search-query">"{search.query}"</span>
-                <span className="search-count">{search.count}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="detail-card">
-          <h3>Top Destinations</h3>
-          <ul className="destination-list">
-            {activityData.topDestinations.map((dest, index) => (
-              <li key={index}>
-                <span className="dest-rank">#{index + 1}</span>
-                <span className="dest-name">{dest.name}</span>
-                <span className="dest-views">{dest.views} views</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="detail-card">
-          <h3>Daily Activity</h3>
-          <div className="activity-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Searches</th>
-                  <th>Signups</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activityData.userActivity.map((day, index) => (
-                  <tr key={index}>
-                    <td>{day.date}</td>
-                    <td>{day.searches}</td>
-                    <td>{day.signups}</td>
-                  </tr>
+          <div className="activity-details">
+            <div className="detail-card">
+              <h3>Popular Searches</h3>
+              <ul className="search-list">
+                {(activityData.popular_searches || []).map((search, index) => (
+                  <li key={index}>
+                    <span className="search-query">"{search.query}"</span>
+                    <span className="search-count">{search.count}</span>
+                  </li>
                 ))}
-              </tbody>
-            </table>
+              </ul>
+            </div>
+
+            <div className="detail-card">
+              <h3>Top Saved Destinations</h3>
+              <ul className="destination-list">
+                {(activityData.top_destinations || []).map((dest, index) => (
+                  <li key={index}>
+                    <span className="dest-rank">#{index + 1}</span>
+                    <span className="dest-name">{dest.name}</span>
+                    <span className="dest-views">{dest.views} saves</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="detail-card">
+              <h3>Daily Activity</h3>
+              <div className="activity-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Events</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(activityData.daily_activity || []).map((day, index) => (
+                      <tr key={index}>
+                        <td>{day.date}</td>
+                        <td>{day.events}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="detail-card">
+              <h3>Recent Activity</h3>
+              <ul className="search-list">
+                {(activityData.recent_activity || []).map((item, index) => (
+                  <li key={index}>
+                    <span className="search-query">{item.event_type}</span>
+                    <span className="search-count">{(item.timestamp || '').replace('T', ' ').slice(0, 16)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };
 
 // Feedback Management Component
 const FeedbackManagement = () => {
-  const [feedbacks, setFeedbacks] = useState([
-    { id: 1, user: 'john@email.com', destination: 'Hunza Valley', rating: 5, comment: 'Amazing experience! The recommendations were spot on.', date: '2024-01-22', status: 'new' },
-    { id: 2, user: 'sara@email.com', destination: 'Skardu', rating: 4, comment: 'Good trip overall. Budget estimation was helpful.', date: '2024-01-21', status: 'reviewed' },
-    { id: 3, user: 'ahmed@email.com', destination: 'Karachi Beach', rating: 3, comment: 'Expected more activity suggestions.', date: '2024-01-20', status: 'new' },
-    { id: 4, user: 'fatima@email.com', destination: 'Naran Kaghan', rating: 5, comment: 'Perfect recommendations for family trip!', date: '2024-01-19', status: 'resolved' },
-    { id: 5, user: 'ali@email.com', destination: 'Swat Valley', rating: 4, comment: 'Loved the AI suggestions. Very accurate!', date: '2024-01-18', status: 'reviewed' }
-  ]);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const updateStatus = (id, status) => {
-    setFeedbacks(feedbacks.map(f => f.id === id ? { ...f, status } : f));
-    toast.success('Feedback status updated');
+  useEffect(() => {
+    const fetchFeedback = async () => {
+      try {
+        const response = await adminService.getFeedback();
+        setFeedbacks(response.data);
+      } catch (error) {
+        toast.error('Failed to load feedback');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeedback();
+  }, []);
+
+  const updateStatus = async (id, status) => {
+    try {
+      await adminService.updateFeedback(id, status);
+      setFeedbacks(feedbacks.map(f => f.id === id ? { ...f, status } : f));
+      toast.success('Feedback status updated');
+    } catch (error) {
+      toast.error('Failed to update feedback');
+    }
   };
 
   const getStatusIcon = (status) => {
@@ -960,63 +985,69 @@ const FeedbackManagement = () => {
         <h2><FaComments /> User Feedback</h2>
       </div>
 
-      <div className="feedback-summary">
-        <div className="feedback-stat">
-          <span className="stat-number">{feedbacks.filter(f => f.status === 'new').length}</span>
-          <span className="stat-label">New</span>
-        </div>
-        <div className="feedback-stat">
-          <span className="stat-number">{feedbacks.filter(f => f.status === 'reviewed').length}</span>
-          <span className="stat-label">Reviewed</span>
-        </div>
-        <div className="feedback-stat">
-          <span className="stat-number">{feedbacks.filter(f => f.status === 'resolved').length}</span>
-          <span className="stat-label">Resolved</span>
-        </div>
-      </div>
-
-      <div className="feedback-list">
-        {feedbacks.map((feedback) => (
-          <div key={feedback.id} className={`feedback-card ${feedback.status}`}>
-            <div className="feedback-header">
-              <div className="feedback-user">
-                <strong>{feedback.user}</strong>
-                <span className="feedback-destination">on {feedback.destination}</span>
-              </div>
-              <div className="feedback-meta">
-                <span className="feedback-rating">
-                  {'⭐'.repeat(feedback.rating)}
-                </span>
-                <span className="feedback-date">{feedback.date}</span>
-              </div>
+      {loading ? (
+        <div className="loading">Loading...</div>
+      ) : (
+        <>
+          <div className="feedback-summary">
+            <div className="feedback-stat">
+              <span className="stat-number">{feedbacks.filter(f => f.status === 'new').length}</span>
+              <span className="stat-label">New</span>
             </div>
-            <p className="feedback-comment">"{feedback.comment}"</p>
-            <div className="feedback-actions">
-              <span className={`status-badge ${feedback.status}`}>
-                {getStatusIcon(feedback.status)} {feedback.status}
-              </span>
-              <div className="action-buttons">
-                {feedback.status !== 'reviewed' && (
-                  <button 
-                    className="action-btn review"
-                    onClick={() => updateStatus(feedback.id, 'reviewed')}
-                  >
-                    Mark Reviewed
-                  </button>
-                )}
-                {feedback.status !== 'resolved' && (
-                  <button 
-                    className="action-btn resolve"
-                    onClick={() => updateStatus(feedback.id, 'resolved')}
-                  >
-                    Resolve
-                  </button>
-                )}
-              </div>
+            <div className="feedback-stat">
+              <span className="stat-number">{feedbacks.filter(f => f.status === 'reviewed').length}</span>
+              <span className="stat-label">Reviewed</span>
+            </div>
+            <div className="feedback-stat">
+              <span className="stat-number">{feedbacks.filter(f => f.status === 'resolved').length}</span>
+              <span className="stat-label">Resolved</span>
             </div>
           </div>
-        ))}
-      </div>
+
+          <div className="feedback-list">
+            {feedbacks.map((feedback) => (
+              <div key={feedback.id} className={`feedback-card ${feedback.status}`}>
+                <div className="feedback-header">
+                  <div className="feedback-user">
+                    <strong>{feedback.user}</strong>
+                    <span className="feedback-destination">on {feedback.destination}</span>
+                  </div>
+                  <div className="feedback-meta">
+                    <span className="feedback-rating">
+                      {'⭐'.repeat(feedback.rating)}
+                    </span>
+                    <span className="feedback-date">{feedback.date}</span>
+                  </div>
+                </div>
+                <p className="feedback-comment">"{feedback.comment}"</p>
+                <div className="feedback-actions">
+                  <span className={`status-badge ${feedback.status}`}>
+                    {getStatusIcon(feedback.status)} {feedback.status}
+                  </span>
+                  <div className="action-buttons">
+                    {feedback.status !== 'reviewed' && (
+                      <button 
+                        className="action-btn review"
+                        onClick={() => updateStatus(feedback.id, 'reviewed')}
+                      >
+                        Mark Reviewed
+                      </button>
+                    )}
+                    {feedback.status !== 'resolved' && (
+                      <button 
+                        className="action-btn resolve"
+                        onClick={() => updateStatus(feedback.id, 'resolved')}
+                      >
+                        Resolve
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

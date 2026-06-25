@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { FaUser, FaSave, FaHeart, FaCog, FaHistory, FaEdit } from 'react-icons/fa';
+import { FaUser, FaSave, FaHeart, FaCog, FaHistory, FaEdit, FaShareAlt, FaTrash, FaTimes } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Profile.css';
 
 const Profile = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, updateSavedTrip, deleteSavedTrip, shareSavedTrip } = useAuth();
   const [activeTab, setActiveTab] = useState('preferences');
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tripModalOpen, setTripModalOpen] = useState(false);
+  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [tripLoading, setTripLoading] = useState(false);
+  const [shareLoadingId, setShareLoadingId] = useState(null);
 
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -19,6 +23,13 @@ const Profile = () => {
       weather_preference: user?.preferences?.weather_preference || '',
       preferred_activities: user?.preferences?.preferred_activities || []
     }
+  });
+
+  const [tripFormData, setTripFormData] = useState({
+    destination: '',
+    days: 1,
+    budget_total: 0,
+    notes: ''
   });
 
   const travelStyles = ['Adventure', 'Relaxation', 'Family', 'Cultural', 'Historical', 'Religious'];
@@ -69,6 +80,88 @@ const Profile = () => {
     if (result.success) {
       toast.success('Profile updated successfully!');
       setEditing(false);
+    } else {
+      toast.error(result.error);
+    }
+  };
+
+  const openTripEditor = (trip) => {
+    setSelectedTrip(trip);
+    setTripFormData({
+      destination: trip.destination || '',
+      days: trip.days || 1,
+      budget_total: trip.budget_estimate?.total || 0,
+      notes: trip.notes || ''
+    });
+    setTripModalOpen(true);
+  };
+
+  const closeTripEditor = () => {
+    setTripModalOpen(false);
+    setSelectedTrip(null);
+    setTripLoading(false);
+  };
+
+  const handleTripChange = (e) => {
+    const { name, value } = e.target;
+    setTripFormData(prev => ({
+      ...prev,
+      [name]: name === 'days' || name === 'budget_total' ? Number(value) : value
+    }));
+  };
+
+  const handleTripSave = async (e) => {
+    e.preventDefault();
+    if (!selectedTrip) return;
+
+    setTripLoading(true);
+    const result = await updateSavedTrip(selectedTrip.id, {
+      destination: tripFormData.destination,
+      days: tripFormData.days,
+      notes: tripFormData.notes,
+      budget_estimate: {
+        ...(selectedTrip.budget_estimate || {}),
+        total: Number(tripFormData.budget_total) || 0
+      }
+    });
+    setTripLoading(false);
+
+    if (result.success) {
+      toast.success('Saved trip updated successfully!');
+      closeTripEditor();
+    } else {
+      toast.error(result.error);
+    }
+  };
+
+  const handleTripDelete = async (trip) => {
+    const confirmed = window.confirm(`Delete your saved trip to ${trip.destination}?`);
+    if (!confirmed) return;
+
+    setTripLoading(true);
+    const result = await deleteSavedTrip(trip.id);
+    setTripLoading(false);
+
+    if (result.success) {
+      toast.success('Saved trip deleted successfully!');
+    } else {
+      toast.error(result.error);
+    }
+  };
+
+  const handleTripShare = async (trip) => {
+    setShareLoadingId(trip.id);
+    const result = await shareSavedTrip(trip.id);
+    setShareLoadingId(null);
+
+    if (result.success && result.shareUrl) {
+      try {
+        await navigator.clipboard.writeText(result.shareUrl);
+        toast.success('Share link copied to clipboard!');
+      } catch (error) {
+        window.prompt('Copy your share link', result.shareUrl);
+        toast.success('Share link ready to copy');
+      }
     } else {
       toast.error(result.error);
     }
@@ -290,6 +383,27 @@ const Profile = () => {
                       <span className="saved-date">
                         Saved: {new Date(trip.saved_at).toLocaleDateString()}
                       </span>
+                      <div className="trip-actions">
+                        <button className="trip-action-btn" onClick={() => openTripEditor(trip)} type="button">
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          className="trip-action-btn share"
+                          onClick={() => handleTripShare(trip)}
+                          type="button"
+                          disabled={shareLoadingId === trip.id}
+                        >
+                          <FaShareAlt /> {shareLoadingId === trip.id ? 'Sharing...' : 'Share'}
+                        </button>
+                        <button
+                          className="trip-action-btn delete"
+                          onClick={() => handleTripDelete(trip)}
+                          type="button"
+                          disabled={tripLoading}
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -332,6 +446,71 @@ const Profile = () => {
           )}
         </div>
       </div>
+
+      {tripModalOpen && selectedTrip && (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal-content trip-modal">
+            <div className="modal-header">
+              <h2>Edit Saved Trip</h2>
+              <button className="close-btn" onClick={closeTripEditor} type="button" aria-label="Close trip editor">
+                <FaTimes />
+              </button>
+            </div>
+
+            <form className="destination-form" onSubmit={handleTripSave}>
+              <div className="form-group">
+                <label>Destination</label>
+                <input
+                  type="text"
+                  name="destination"
+                  value={tripFormData.destination}
+                  onChange={handleTripChange}
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Days</label>
+                  <input
+                    type="number"
+                    name="days"
+                    min="1"
+                    value={tripFormData.days}
+                    onChange={handleTripChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Budget Total (PKR)</label>
+                  <input
+                    type="number"
+                    name="budget_total"
+                    min="0"
+                    value={tripFormData.budget_total}
+                    onChange={handleTripChange}
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Notes</label>
+                <textarea
+                  name="notes"
+                  rows="4"
+                  value={tripFormData.notes}
+                  onChange={handleTripChange}
+                  placeholder="Add anything you want to remember about this trip"
+                />
+              </div>
+              <div className="form-actions">
+                <button type="button" className="admin-cancel-btn" onClick={closeTripEditor}>
+                  Cancel
+                </button>
+                <button type="submit" className="add-btn" disabled={tripLoading}>
+                  {tripLoading ? 'Saving...' : <><FaSave /> Save Trip</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

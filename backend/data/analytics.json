@@ -1,0 +1,157 @@
+[
+  {
+    "id": 1,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:03:23.653055Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 2,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:03:23.926782Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 3,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:03:34.206422Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 4,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:03:34.327961Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 5,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:03:45.274916Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 6,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:03:45.366424Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 7,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:05:10.507222Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 8,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:05:10.849862Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 9,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:05:34.884957Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 10,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:05:34.970661Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 11,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:05:50.648436Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 12,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:05:50.985263Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 13,
+    "event_type": "itinerary_generated",
+    "timestamp": "2026-05-22T15:06:24.460642Z",
+    "destination": "Skardu",
+    "region": "Gilgit Baltistan",
+    "days": 7,
+    "budget": null,
+    "budget_status": "within_budget",
+    "intent": "travel_planning"
+  },
+  {
+    "id": 14,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:09:21.194462Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": true
+  },
+  {
+    "id": 15,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-22T15:09:21.525208Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": true
+  },
+  {
+    "id": 16,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-28T12:36:27.371144Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": true
+  },
+  {
+    "id": 17,
+    "event_type": "recommendations",
+    "timestamp": "2026-05-28T12:36:27.461846Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": true
+  },
+  {
+    "id": 18,
+    "event_type": "recommendations",
+    "timestamp": "2026-06-25T12:57:31.904548Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  },
+  {
+    "id": 19,
+    "event_type": "recommendations",
+    "timestamp": "2026-06-25T12:57:32.274422Z",
+    "mode": "post",
+    "result_count": 6,
+    "has_preferences": false
+  }
+]

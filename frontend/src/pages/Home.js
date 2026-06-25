@@ -111,6 +111,35 @@ const Home = () => {
         </section>
       )}
 
+      {homeInsights?.ai_suggestions?.length > 0 && (
+        <section className="section suggestion-section">
+          <div className="section-header">
+            <h2>AI Suggestions</h2>
+          </div>
+          <div className="destinations-row" style={{ gap: '0.75rem', flexWrap: 'wrap' }}>
+            {homeInsights.ai_suggestions.map((item, idx) => (
+              <div key={idx} className="saved-trip-card" style={{ minWidth: '240px' }}>
+                <h3>{item}</h3>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {homeInsights?.trending_destinations?.length > 0 && (
+        <section className="section recommendations-section">
+          <div className="section-header">
+            <h2>Trending Destinations</h2>
+            <p>Popular picks based on saves and views across the app</p>
+          </div>
+          <div className="destinations-grid">
+            {homeInsights.trending_destinations.map((dest, index) => (
+              <DestinationCard key={`${dest.name}-${index}`} destination={dest} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Recommendations Section */}
       <section className="section recommendations-section">
         <div className="section-header">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   FaStar, FaMapMarkerAlt, FaCalendarAlt, FaShieldAlt, 
@@ -20,21 +20,38 @@ const Destination = () => {
   const [similarDestinations, setSimilarDestinations] = useState([]);
   const [budgetEstimate, setBudgetEstimate] = useState(null);
   const [currentWeather, setCurrentWeather] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
   const [selectedDays, setSelectedDays] = useState(3);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const weatherRequestRef = useRef(0);
 
   const fetchDestination = useCallback(async () => {
+    const requestId = weatherRequestRef.current + 1;
+    weatherRequestRef.current = requestId;
     setLoading(true);
+    setWeatherLoading(true);
+    setCurrentWeather(null);
     try {
-      // Try to get by ID first, then by name
-      const response = await destinationService.getAll();
-      const allDestinations = response.data;
-      
-      let found = allDestinations.find(d => d.id === parseInt(id));
+      let found = null;
+      let allDestinations = [];
+
+      try {
+        const response = await destinationService.getById(id);
+        found = response.data;
+      } catch (error) {
+        if (error.response?.status !== 404) {
+          throw error;
+        }
+      }
+
+      const allResponse = await destinationService.getAll();
+      allDestinations = allResponse.data;
+
       if (!found) {
-        found = allDestinations.find(d => 
-          d.name.toLowerCase() === decodeURIComponent(id).toLowerCase()
+        const decodedId = decodeURIComponent(id).toLowerCase();
+        found = allDestinations.find(d =>
+          String(d.id) === String(id) || d.name.toLowerCase() === decodedId
         );
       }
       
@@ -50,6 +67,7 @@ const Destination = () => {
         // Fetch weather in background so it doesn't delay the main page load
         destinationService.getWeatherHighlights(found.region)
           .then(weatherResponse => {
+            if (weatherRequestRef.current !== requestId) return;
             const data = weatherResponse.data;
             if (Array.isArray(data) && data.length > 0) {
               const item = data.find(d => d.destination === found.name) || data[0];
@@ -57,14 +75,23 @@ const Destination = () => {
                 setCurrentWeather(item.weather);
               }
             }
+            setWeatherLoading(false);
           })
           .catch(weatherErr => {
+            if (weatherRequestRef.current !== requestId) return;
             console.error('Error fetching weather:', weatherErr);
+            setWeatherLoading(false);
           });
+      } else {
+        setDestination(null);
+        setSimilarDestinations([]);
+        setBudgetEstimate(null);
+        setWeatherLoading(false);
       }
     } catch (error) {
       console.error('Error fetching destination:', error);
       toast.error('Failed to load destination');
+      setWeatherLoading(false);
     } finally {
       setLoading(false);
     }
@@ -185,9 +212,9 @@ const Destination = () => {
         />
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <a href="#" className="back-link" onClick={(e) => { e.preventDefault(); navigate(-1); }}>
+          <button type="button" className="back-link" onClick={() => navigate(-1)}>
             <FaArrowLeft /> Back
-          </a>
+          </button>
           <div className="hero-info">
             <span className="type-badge">{destination.type}</span>
             <h1>{destination.name}</h1>
@@ -236,8 +263,15 @@ const Destination = () => {
                   <FaCloud className="fact-icon" />
                   <span className="fact-label">Weather</span>
                   <span className="fact-value">
-                    {currentWeather ? `${currentWeather.temperature}°C, ${currentWeather.condition}` : destination.weather}
+                    {weatherLoading
+                      ? 'Loading live weather...'
+                      : currentWeather
+                        ? `${currentWeather.temperature}°C, ${currentWeather.condition}`
+                        : destination.weather}
                   </span>
+                  {currentWeather?.description && !weatherLoading && (
+                    <small className="fact-subvalue">{currentWeather.description}</small>
+                  )}
                 </div>
                 <div className="fact-card">
                   <FaCalendarAlt className="fact-icon" />

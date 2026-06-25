@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Content-Based Filtering",
+    "version": "1.2.0",
+    "status": "active",
+    "accuracy": 87,
+    "last_trained": "2024-01-15",
+    "description": "Recommends destinations based on activity preferences and user history"
+  },
+  {
+    "id": 2,
+    "name": "Collaborative Filtering",
+    "version": "2.0.1",
+    "status": "active",
+    "accuracy": 92,
+    "last_trained": "2024-01-20",
+    "description": "Uses user similarity patterns for recommendations"
+  },
+  {
+    "id": 3,
+    "name": "NLP Query Parser",
+    "version": "1.5.0",
+    "status": "active",
+    "accuracy": 95,
+    "last_trained": "2024-01-18",
+    "description": "Parses natural language queries for destination search"
+  },
+  {
+    "id": 4,
+    "name": "Budget Optimizer",
+    "version": "1.0.0",
+    "status": "inactive",
+    "accuracy": 78,
+    "last_trained": "2024-01-10",
+    "description": "Optimizes trip costs based on user budget constraints"
+  }
+]
